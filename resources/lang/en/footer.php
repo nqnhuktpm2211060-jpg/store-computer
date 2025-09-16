@@ -1,0 +1,21 @@
+<?php
+return [
+    'fresh_products' => 'Fresh Products',
+    'free_delivery' => 'Free Delivery on order above $50',
+    'daily_mega_discount' => 'Daily Mega Discount',
+    'best_price' => 'Best price on the market',
+    'company_name' => 'TECHBYTE Technology Investment Company Limited',
+    'address' => '256, Nguyen Van Cu, An Khanh, Ninh Kieu, Can Tho',
+    'email' => 'ai@idai.vn',
+    'categories' => 'Categories',
+    'useful_links' => 'Useful Links',
+    'home' => 'Home',
+    'shop' => 'Shop',
+    'news' => 'News',
+    'contact_us' => 'Contact Us',
+    'hotline' => '24/7 Hotline',
+    'email_address' => 'Email Address',
+    'download_app' => 'Download App',
+    'all_rights_reserved' => 'All Rights Reserved',
+    'keep_in_touch' => 'Keep in touch',
+];

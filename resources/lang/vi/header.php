@@ -1,0 +1,20 @@
+<?php
+return [
+    'your_location' => 'Vị trí của bạn',
+    'search_product' => 'Tìm kiếm sản phẩm ...',
+    'total' => 'Tổng cộng',
+    'view_cart' => 'Xem giỏ hàng',
+    'checkout' => 'Thanh toán',
+    'hello' => 'Xin chào',
+    'my_account' => 'Tài khoản của tôi',
+    'logout' => 'Đăng xuất',
+    'login' => 'Đăng nhập',
+    'register' => 'Đăng ký',
+    'categories' => 'Danh Mục',
+    'menu' => 'Menu',
+    'go_to_market' => 'Siêu Thị Công Nghệ',
+    'hot_deals' => 'Ưu Đãi Hot',
+    'discount' => 'Khuyến mãi',
+    'news' => 'Tin Tức',
+    'today_discount' => 'Giảm giá hôm nay',
+];

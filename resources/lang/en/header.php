@@ -1,0 +1,20 @@
+<?php
+return [
+    'your_location' => 'Your Location',
+    'search_product' => 'Search product ...',
+    'total' => 'Total',
+    'view_cart' => 'View cart',
+    'checkout' => 'Checkout',
+    'hello' => 'Hello',
+    'my_account' => 'My Account',
+    'logout' => 'Logout',
+    'login' => 'Login',
+    'register' => 'Register',
+    'categories' => 'Categories',
+    'menu' => 'Menu',
+    'go_to_market' => 'Technology Supermarket',
+    'hot_deals' => 'Hot Deals',
+    'discount' => 'Discount',
+    'news' => 'News',
+    'today_discount' => 'Today Discount',
+];

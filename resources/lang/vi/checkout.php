@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'title' => 'Thanh toán',
+    'delivery_address' => 'Địa chỉ giao hàng',
+    'full_name' => 'Họ và tên',
+    'email' => 'Email',
+    'phone_number' => 'Số điện thoại',
+    'province' => 'Tỉnh / Thành phố',
+    'district' => 'Quận / huyện',
+    'ward' => 'Phường / xã',
+    'address' => 'Địa chỉ',
+    'payment_options' => 'Tùy chọn thanh toán',
+    'cash_on_delivery' => 'Thanh toán khi nhận hàng',
+    'check_before_receive' => 'Được phép kiểm tra hàng trước khi nhận',
+    'vnpay' => 'Thanh toán bằng VNPay',
+    'order_summary' => 'Tóm tắt Đặt hàng',
+    'subtotal' => 'Tổng phụ',
+    'shipping' => 'Vận chuyển',
+    'coupon_code' => 'Phiếu giảm giá/Mã',
+    'total' => 'Tổng cộng',
+    'place_order' => 'Đặt hàng',
+    'select_province' => 'Chọn tỉnh / thành phố',
+    'select_district' => 'Chọn quận / huyện',
+    'select_ward' => 'Chọn phường / xã',
+];

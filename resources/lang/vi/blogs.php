@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'title' => 'Tin Tức',
+    'read_more' => 'Xem thêm',
+    'search_posts' => 'Tìm kiếm....',
+    'recent_posts' => 'Bài viết gần đây',
+    'no_posts' => 'Không có bài viết nào',
+    'no_recent_posts' => 'Không có bài viết gần đây','title' => 'Tin Tức',
+    'read_more' => 'Xem thêm',
+    'search_posts' => 'Tìm kiếm....',
+    'recent_posts' => 'Bài viết gần đây',
+    'no_posts' => 'Không có bài viết nào',
+    'no_recent_posts' => 'Không có bài viết gần đây',
+    'blog_detail' => 'Chi tiết tin tức',
+    'news' => 'Tin tức',
+    'comments' => 'Bình luận',
+    'anonymous' => 'Ẩn danh',
+    'leave_a_comment' => 'Để lại bình luận',
+    'email_not_published' => 'Địa chỉ email của bạn sẽ không được công bố. Các trường bắt buộc được đánh dấu',
+    'your_name' => 'Họ và tên',
+    'your_email' => 'Địa chỉ Email',
+    'comment' => 'Bình luận',
+    'post_comment' => 'Đăng bình luận',
+    'no_comments' => 'Không có bình luận nào',
+];

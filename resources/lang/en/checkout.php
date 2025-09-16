@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'title' => 'Checkout',
+    'delivery_address' => 'Delivery address',
+    'full_name' => 'Full name',
+    'email' => 'Email',
+    'phone_number' => 'Phone number',
+    'province' => 'Province / City',
+    'district' => 'District',
+    'ward' => 'Ward',
+    'address' => 'Address',
+    'payment_options' => 'Payment options',
+    'cash_on_delivery' => 'Cash on delivery',
+    'check_before_receive' => 'You are allowed to check the goods before receiving',
+    'vnpay' => 'Payment with VNPay',
+    'order_summary' => 'Order summary',
+    'subtotal' => 'Subtotal',
+    'shipping' => 'Shipping',
+    'coupon_code' => 'Coupon code',
+    'total' => 'Total',
+    'place_order' => 'Place order',
+    'select_province' => 'Select province / city',
+    'select_district' => 'Select district',
+    'select_ward' => 'Select ward',
+];

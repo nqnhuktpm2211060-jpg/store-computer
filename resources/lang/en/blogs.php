@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'title' => 'News',
+    'read_more' => 'Read More',
+    'search_posts' => 'Search....',
+    'recent_posts' => 'Recent Posts',
+    'no_posts' => 'No posts available',
+    'no_recent_posts' => 'No recent posts','title' => 'News',
+    'read_more' => 'Read More',
+    'search_posts' => 'Search....',
+    'recent_posts' => 'Recent Posts',
+    'no_posts' => 'No posts available',
+    'no_recent_posts' => 'No recent posts',
+    'blog_detail' => 'News Details',
+    'news' => 'News',
+    'comments' => 'Comments',
+    'anonymous' => 'Anonymous',
+    'leave_a_comment' => 'Leave a comment',
+    'email_not_published' => 'Your email address will not be published. Required fields are marked',
+    'your_name' => 'Your name',
+    'your_email' => 'Email Address',
+    'comment' => 'Comment',
+    'post_comment' => 'Post Comment',
+    'no_comments' => 'No comments yet',
+];

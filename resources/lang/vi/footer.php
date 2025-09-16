@@ -1,0 +1,21 @@
+<?php
+return [
+    'fresh_products' => 'Sản phẩm tươi',
+    'free_delivery' => 'Giao hàng miễn phí cho đơn hàng trên $50',
+    'daily_mega_discount' => 'Giảm giá Mega hàng ngày',
+    'best_price' => 'Giá tốt nhất trên thị trường',
+    'company_name' => 'Công Ty TNHH Đầu Tư Công Nghệ TECHBYTE',
+    'address' => 'Số 256, Đường Nguyễn Văn Cừ, Phường An Khánh, Ninh Kiều, Cần Thơ',
+    'email' => 'ai@idai.vn',
+    'categories' => 'Thể loại',
+    'useful_links' => 'Liên kết hữu ích',
+    'home' => 'Trang chủ',
+    'shop' => 'Cửa hàng',
+    'news' => 'Tin tức',
+    'contact_us' => 'Liên hệ với chúng tôi',
+    'hotline' => 'Hotline 24/7',
+    'email_address' => 'Địa chỉ Email',
+    'download_app' => 'Tải ứng dụng',
+    'all_rights_reserved' => 'Bảo lưu mọi quyền',
+    'keep_in_touch' => 'Giữ kết nối',
+];
