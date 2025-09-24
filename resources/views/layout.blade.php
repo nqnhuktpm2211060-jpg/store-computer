@@ -742,7 +742,7 @@
     <!-- Fly Cart Js -->
     <script src="../assets/js/fly-cart.js"></script>
 
-    <!-- WOW js -->
+    <!-- WOW js --->
     <script src="../assets/js/wow.min.js"></script>
     <script src="../assets/js/custom-wow.js"></script>
 
