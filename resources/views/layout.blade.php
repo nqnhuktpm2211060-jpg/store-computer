@@ -739,7 +739,7 @@
     <!-- Timer Js -->
     <script src="../assets/js/timer1.js"></script>
 
-    <!-- Fly Cart Js -->
+    <!-- Fly Cart Js --->
     <script src="../assets/js/fly-cart.js"></script>
 
     <!-- WOW js -=-->
