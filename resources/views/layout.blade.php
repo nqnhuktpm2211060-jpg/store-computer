@@ -11,6 +11,7 @@
     <meta name="description" content="Fastkart">
     <meta name="keywords" content="Fastkart">
     <meta name="author" content="Fastkart">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="../assets/logo.jpg" type="image/x-icon">
 
     <title>@yield('title')</title>
@@ -38,7 +39,10 @@
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Template css -->
-    <link id="color-link" rel="stylesheet" type="text/css" href="../assets/css/style.css">
+    <link id="color-link" rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}">
+    
+    <!-- Chatbot CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/chatbot.css') }}">
 
 </head>
 
@@ -1124,6 +1128,9 @@
         addToCart();
         getMyCart();
     </script>
+
+    <!-- Chatbot JavaScript -->
+    <script src="{{ asset('assets/js/chatbot.js') }}"></script>
 
     @yield('scripts')
 </body>

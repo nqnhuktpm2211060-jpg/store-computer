@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\RivewProductController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PaymentController;
@@ -67,6 +68,9 @@ Route::middleware('set_locale')->group(function () {
     Route::post('cart/decrease/{index}', [CartController::class, 'decrease'])->name('decreaseCart');
     Route::post('cart/increase/{index}', [CartController::class, 'increase'])->name('increaseCart');
     Route::DELETE('delete-cart/{index}', [CartController::class, 'deleteCart'])->name('deleteCart');
+
+    // Chatbot route
+    Route::post('chat', [ChatController::class, 'chat'])->name('chat');
 
     Route::middleware('auth')->group(function () {
         Route::get('thong-tin-ca-nhan', [PagesController::class, 'profile'])->name('profile');
