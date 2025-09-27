@@ -213,23 +213,20 @@ class Product extends Model
     // Translated helpers (from translations JSON)
     public function getNameTranslatedAttribute()
     {
-        $locale = app()->getLocale();
-        $trans = is_array($this->translations) ? ($this->translations[$locale] ?? null) : null;
-        return $trans['name'] ?? $this->name;
+        // Keep product name stable across locales; only UI strings should localize
+        return $this->name;
     }
 
     public function getShortDescriptionTranslatedAttribute()
     {
-        $locale = app()->getLocale();
-        $trans = is_array($this->translations) ? ($this->translations[$locale] ?? null) : null;
-        return $trans['short_description'] ?? $this->short_description;
+        // Keep short description stable across locales
+        return $this->short_description;
     }
 
     public function getDescriptionTranslatedAttribute()
     {
-        $locale = app()->getLocale();
-        $trans = is_array($this->translations) ? ($this->translations[$locale] ?? null) : null;
-        return $trans['description'] ?? $this->description;
+        // Keep description stable across locales
+        return $this->description;
     }
 
     // Characteristics derived from specifications JSON

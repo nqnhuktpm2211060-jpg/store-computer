@@ -31,7 +31,8 @@ class Category extends Model
     }
 
     public function getNameTranslatedAttribute(){
-        return $this->translations()->where('language_code', App::getLocale())->first()->name ?? $this->name;
+        // Keep category name stable across locales; ignore translation to avoid logic conflicts
+        return $this->name;
     }
 
     // Helpers for icon normalization

@@ -15,7 +15,7 @@
                     <ul>
                         @foreach ($category->categoryChilden as $cate)
                             <li>
-                                <a href="{{ route('product.index', ['category' => $cate->name]) }}">{{ $cate->name_translated }}</a>
+                                <a href="{{ route('product.index', ['category_l1_id' => $category->id, 'category_id' => $cate->id]) }}">{{ $cate->name_translated }}</a>
                             </li>
                         @endforeach
                     </ul>

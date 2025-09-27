@@ -14,13 +14,25 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $productQuery = Product::with('reviews', 'category');
-        $categoryQuery = Category::with('products', 'translations');
-        if ($request->category_l1) {
+        $categoryQuery = Category::with(['products', 'translations', 'categoryParent']);
+
+        // Prefer ID-based filtering to avoid locale/translation mismatches; keep legacy name params as fallback
+        $categoryL1Id = $request->get('category_l1_id');
+        $categoryId = $request->get('category_id');
+
+        if ($categoryL1Id) {
+            $productQuery->whereHas('category', function ($q) use ($categoryL1Id) {
+                $q->where('parent_id', (int) $categoryL1Id);
+            });
+        } elseif ($request->category_l1) {
             $productQuery->whereHas('category.categoryParent', function ($query) use ($request) {
                 $query->where('name', $request->category_l1);
             });
         }
-        if ($request->category) {
+
+        if ($categoryId) {
+            $productQuery->where('category_id', (int) $categoryId);
+        } elseif ($request->category) {
             $productQuery->whereHas('category', function ($query) use ($request) {
                 $query->where('name', $request->category);
             });

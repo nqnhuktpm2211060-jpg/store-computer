@@ -15,11 +15,16 @@
                                         <i class="fa-solid fa-house"></i>
                                     </a>
                                 </li>
-                                @if (request('category_l1') || request('category'))
+                                @php
+                                    $activeL1 = request('category_l1_id');
+                                    $activeCat = request('category_id');
+                                @endphp
+                                @if ($activeL1 || $activeCat || request('category_l1') || request('category'))
                                     <li class="breadcrumb-item"> <a
                                             href="{{ route('product.index') }}">{{ __('product.shop_at_home') }}</a>
                                     </li>
-                                    <li class="breadcrumb-item active">{{ request('category_l1') }}{{ request('category') }}
+                                    <li class="breadcrumb-item active">
+                                        {{ request('category_l1') ?? request('category') }}
                                     </li>
                                 @else
                                     <li class="breadcrumb-item active">{{ __('product.shop_at_home') }}</li>
@@ -40,8 +45,12 @@
                         @foreach ($categories->where('level', 1) as $category)
                             <div>
                                 <div class="shop-category-box">
-                                    <a
-                                        href="{{ route('product.index', array_merge(request()->query(), ['category_l1' => $category->name])) }}">
+                                    @php
+                                        // Build link using ID param and removing lower-level filter
+                                        $query = collect(request()->query())->except(['category','category_id'])->toArray();
+                                        $url = route('product.index', $query + ['category_l1_id' => $category->id]);
+                                    @endphp
+                                    <a href="{{ $url }}">
                                         <div class="shop-category-image">
                                             <img src="{{ $category->icon_url }}" class="blur-up lazyload" alt="">
                                         </div>
@@ -91,18 +100,25 @@
                                         <div class="accordion-body">
 
 
+                                            @php
+                                                $level2 = $categories->where('level', 2);
+                                                if ($activeL1) {
+                                                    $level2 = $level2->filter(function($c) use ($activeL1){
+                                                        return optional($c->categoryParent)->id == $activeL1;
+                                                    });
+                                                }
+                                            @endphp
                                             <ul class="category-list custom-padding custom-height">
-                                                @foreach ($categories->where('level', 2) as $category)
+                                                @foreach ($level2 as $category)
+                                                    @php
+                                                        $isActive = (string)request('category_id') === (string)$category->id;
+                                                        $url = route('product.index', collect(request()->query())->toArray() + ['category_id' => $category->id]);
+                                                    @endphp
                                                     <li>
-                                                        <div class="form-check ps-0 m-0 category-list-box">
-                                                            <input class="checkbox_animated" type="checkbox"
-                                                                id="fruit">
-                                                            <label class="form-check-label" for="fruit">
-                                                                <span class="name">{{ $category->name_translated }}</span>
-                                                                <span
-                                                                    class="number">({{ $category->products->count() }})</span>
-                                                            </label>
-                                                        </div>
+                                                        <a href="{{ $url }}" class="d-flex justify-content-between align-items-center {{ $isActive ? 'fw-bold' : '' }}">
+                                                            <span class="name">{{ $category->name_translated }}</span>
+                                                            <span class="number">({{ $category->products->count() }})</span>
+                                                        </a>
                                                     </li>
                                                 @endforeach
                                             </ul>
