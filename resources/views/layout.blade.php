@@ -737,6 +737,10 @@
     <script src="../assets/js/slick/slick-animation.min.js"></script>
     <script src="../assets/js/slick/custom_slick.js"></script>
 
+    <!-- Elevate Zoom (for product image zoom) -->
+    <script src="../assets/js/jquery.elevatezoom.js"></script>
+    <script src="../assets/js/zoom-filter.js"></script>
+
     <!-- Auto Height Js -->
     <script src="../assets/js/auto-height.js"></script>
 

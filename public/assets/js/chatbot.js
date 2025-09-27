@@ -91,9 +91,9 @@ class SimpleChatBot {
         this.addMessage(message, 'user');
         // Track history (sender: 'user' | 'bot')
         this.history.push({ sender: 'user', text: message });
-        // Keep last 10 entries max to limit payload size
-        if (this.history.length > 10) {
-            this.history = this.history.slice(-10);
+        // Keep last 6 entries max to limit payload size
+        if (this.history.length > 6) {
+            this.history = this.history.slice(-6);
         }
         input.value = '';
         
@@ -119,8 +119,8 @@ class SimpleChatBot {
             if (data.reply) {
                 this.addMessage(data.reply, 'bot');
                 this.history.push({ sender: 'bot', text: data.reply });
-                if (this.history.length > 10) {
-                    this.history = this.history.slice(-10);
+                if (this.history.length > 6) {
+                    this.history = this.history.slice(-6);
                 }
             } else {
                 this.addMessage('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.', 'bot');

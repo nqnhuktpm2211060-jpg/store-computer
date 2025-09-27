@@ -1,7 +1,7 @@
 /* Simple Chatbot Styles */
 .chatbot-widget {
     position: fixed;
-    bottom: 20px;
+    bottom: 120px;
     right: 20px;
     z-index: 9999;
     font-family: Arial, sans-serif;

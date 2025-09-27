@@ -44,7 +44,7 @@
                                                         <img src="{{ $imageUrl }}"
                                                             id="{{ $index == 0 ? 'img-1' : '' }}"
                                                             data-zoom-image="{{ $imageUrl }}"
-                                                            class="img-fluid image_zoom_cls-0 blur-up lazyload"
+                                                            class="img-fluid image_zoom_cls image_zoom_cls-{{ $index }} blur-up lazyload"
                                                             alt="">
                                                     </div>
                                                 </div>

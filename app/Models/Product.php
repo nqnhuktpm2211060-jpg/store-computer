@@ -108,15 +108,30 @@ class Product extends Model
         return asset('uploads/products/' . $value);
     }
 
+    protected function localImageExists($value): bool
+    {
+        if (!$value) return false;
+        if (filter_var($value, FILTER_VALIDATE_URL)) return true; // assume reachable
+        $v = ltrim($value, '/');
+        if (Str::startsWith($v, 'uploads/')) {
+            return file_exists(public_path($v));
+        }
+        return file_exists(public_path('uploads/products/' . $v));
+    }
+
     public function getMainImageAttribute()
     {
-        if ($this->featured_image) {
+        if ($this->featured_image && $this->localImageExists($this->featured_image)) {
             return $this->normalizeImageUrl($this->featured_image);
         }
 
         $images = $this->images;
         if (is_array($images) && !empty($images)) {
-            return $this->normalizeImageUrl($images[0]);
+            foreach ($images as $img) {
+                if ($this->localImageExists($img)) {
+                    return $this->normalizeImageUrl($img);
+                }
+            }
         }
 
         return asset('assets/images/no-image.jpg');
@@ -126,13 +141,15 @@ class Product extends Model
     {
         $allImages = [];
 
-        if ($this->featured_image) {
+        if ($this->featured_image && $this->localImageExists($this->featured_image)) {
             $allImages[] = $this->normalizeImageUrl($this->featured_image);
         }
 
         if (is_array($this->images)) {
             foreach ($this->images as $image) {
-                $allImages[] = $this->normalizeImageUrl($image);
+                if ($this->localImageExists($image)) {
+                    $allImages[] = $this->normalizeImageUrl($image);
+                }
             }
         }
 

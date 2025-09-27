@@ -153,6 +153,10 @@ class ProductService
         $context .= "• Tư vấn theo nhu cầu: gaming, văn phòng, đồ họa\n";
         $context .= "• Có thể so sánh giá và tính năng\n\n";
         
+        // Hard-cap context length to keep prompt small (~1200-1500 chars)
+        if (mb_strlen($context) > 1500) {
+            $context = mb_substr($context, 0, 1500) . "\n…";
+        }
         return $context;
     }
 

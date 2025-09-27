@@ -32,8 +32,8 @@ class ChatController extends Controller
                 $sender = isset($item['sender']) && $item['sender'] === 'bot' ? 'Trợ lý' : 'Khách';
                 // Cắt gọn từng dòng để tránh prompt quá dài
                 $text = trim((string) $item['text']);
-                if (mb_strlen($text) > 300) {
-                    $text = mb_substr($text, 0, 300) . '…';
+                if (mb_strlen($text) > 200) {
+                    $text = mb_substr($text, 0, 200) . '…';
                 }
                 $historyLines[] = "{$sender}: {$text}";
             }
@@ -67,7 +67,7 @@ class ChatController extends Controller
             $prompt .= "LỊCH SỬ CUỘC HỘI THOẠI GẦN ĐÂY (để giữ ngữ cảnh):\n";
             $prompt .= implode("\n", $historyLines) . "\n\n";
         }
-        $prompt .= $storeContext . "\n\n";
+    $prompt .= $storeContext . "\n\n";
         
         if ($specificProducts && $specificProducts->count() > 0) {
             $prompt .= "SẢN PHẨM LIÊN QUAN:\n";
@@ -83,7 +83,12 @@ class ChatController extends Controller
 
         // Gửi request đến Gemini API
         try {
-            $response = Http::post("{$apiUrl}?key={$apiKey}", [
+            // Clip prompt to a safe size bound (~3500 chars) to avoid token overflow
+            if (mb_strlen($prompt) > 3500) {
+                $prompt = mb_substr($prompt, 0, 3500) . "\n…";
+            }
+
+            $response = Http::timeout(12)->post("{$apiUrl}?key={$apiKey}", [
                 'contents' => [
                     [
                         'parts' => [['text' => $prompt]]
@@ -98,6 +103,9 @@ class ChatController extends Controller
                 // Kiểm tra phản hồi hợp lệ
                 if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                     $reply = $data['candidates'][0]['content']['parts'][0]['text'];
+                    if (mb_strlen($reply) > 1200) {
+                        $reply = mb_substr($reply, 0, 1200) . '…';
+                    }
                 } else {
                     $reply = "Xin lỗi, có lỗi xảy ra khi xử lý phản hồi từ AI.";
                 }
@@ -107,6 +115,24 @@ class ChatController extends Controller
                 Log::warning('ChatBot API non-2xx response', ['status' => $status, 'body' => $body]);
                 if ($status === 429 || stripos($body, 'quota') !== false) {
                     $reply = "Chatbot hiện tại đã vượt quá giới hạn sử dụng. Vui lòng thử lại sau 24h.";
+                } else if ($status >= 500 && $status < 600) {
+                    // Thử lại 1 lần nhanh cho lỗi tạm thời
+                    try {
+                        $retry = Http::timeout(10)->post("{$apiUrl}?key={$apiKey}", [
+                            'contents' => [[ 'parts' => [['text' => $prompt]] ]]
+                        ]);
+                        if ($retry->successful()) {
+                            $data = $retry->json();
+                            $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+                            if (!$reply) {
+                                $reply = "Xin lỗi, có lỗi xảy ra khi xử lý phản hồi từ AI.";
+                            }
+                        } else {
+                            $reply = "Xin lỗi, không thể kết nối với dịch vụ AI.";
+                        }
+                    } catch (\Throwable $e2) {
+                        $reply = "Xin lỗi, không thể kết nối với dịch vụ AI.";
+                    }
                 } else {
                     $reply = "Xin lỗi, không thể kết nối với dịch vụ AI.";
                 }
@@ -120,6 +146,8 @@ class ChatController extends Controller
             // Xử lý lỗi quota exceeded
             if (strpos($e->getMessage(), 'quota') !== false || strpos($e->getMessage(), '429') !== false) {
                 $reply = "Chatbot hiện tại đã vượt quá giới hạn sử dụng. Vui lòng thử lại sau 24h.";
+            } else if (strpos($e->getMessage(), 'timed out') !== false) {
+                $reply = "Hệ thống đang chậm. Bạn vui lòng thử lại sau ít phút nhé.";
             } else {
                 $reply = "Xin lỗi, có lỗi xảy ra khi giao tiếp với dịch vụ AI.";
             }
