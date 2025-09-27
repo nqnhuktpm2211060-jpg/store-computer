@@ -202,6 +202,10 @@
                                                     </li>
 
                                                     <li class="product-box-contain">
+                                                        <a href="{{ route('orders.index') }}">Đơn hàng của tôi</a>
+                                                    </li>
+
+                                                    <li class="product-box-contain">
                                                         <a href="{{ route('logout') }}">{{ __('header.logout') }}</a>
                                                     </li>
                                                 </ul>

@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 
@@ -125,6 +126,7 @@ class PaymentByVnpay {
             DB::beginTransaction();
             try {
                 $order = Order::create([
+                    'user_id' => Auth::id(),
                     'full_name' => $tempOrder['full_name'],
                     'email' => $tempOrder['email'],
                     'phone_number' => $tempOrder['phone_number'],

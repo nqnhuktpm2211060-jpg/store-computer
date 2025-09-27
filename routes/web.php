@@ -18,6 +18,7 @@ use App\Http\Controllers\PagesController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\vnpay\PaymentByVnpay;
+use App\Http\Controllers\UserOrderController;
 use Illuminate\Support\Facades\Route;
 use PhpParser\Node\Expr\FuncCall;
 
@@ -78,6 +79,10 @@ Route::middleware('set_locale')->group(function () {
         Route::post('dat-hang', [PaymentController::class, 'placeOrder'])->name('placeOrder');
         Route::get('payment-vnpay-return', [PaymentByVnpay::class, 'handlePaymentReturn'])->name('payment.vnpay.return');
         Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
+        // User orders
+        Route::get('don-hang-cua-toi', [UserOrderController::class, 'index'])->name('orders.index');
+        Route::get('don-hang/{id}', [UserOrderController::class, 'show'])->name('orders.show');
     });
 
     Route::get('/lang/{locale}', [LanguageController::class, 'switchLang'])->name('lang.switch');

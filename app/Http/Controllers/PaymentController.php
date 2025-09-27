@@ -80,6 +80,7 @@ class PaymentController extends Controller
             ]);
 
             $order = Order::create([
+                'user_id' => $request->user()->id ?? null,
                 'full_name' => $request->full_name,
                 'email' => $request->email,
                 'phone_number' => $request->phone_number,
