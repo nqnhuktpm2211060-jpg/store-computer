@@ -3,6 +3,7 @@ class SimpleChatBot {
     constructor() {
         this.isOpen = false;
         this.isTyping = false;
+        this.history = []; // transient in-memory message history
         this.createChatbot();
         this.attachEvents();
         this.showWelcome();
@@ -88,6 +89,12 @@ class SimpleChatBot {
 
         // Add user message
         this.addMessage(message, 'user');
+        // Track history (sender: 'user' | 'bot')
+        this.history.push({ sender: 'user', text: message });
+        // Keep last 10 entries max to limit payload size
+        if (this.history.length > 10) {
+            this.history = this.history.slice(-10);
+        }
         input.value = '';
         
         // Show typing
@@ -104,13 +111,17 @@ class SimpleChatBot {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': token
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({ message: message, history: this.history })
             });
 
             const data = await response.json();
             
             if (data.reply) {
                 this.addMessage(data.reply, 'bot');
+                this.history.push({ sender: 'bot', text: data.reply });
+                if (this.history.length > 10) {
+                    this.history = this.history.slice(-10);
+                }
             } else {
                 this.addMessage('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.', 'bot');
             }

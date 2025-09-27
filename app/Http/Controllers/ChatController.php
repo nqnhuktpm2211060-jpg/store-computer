@@ -21,6 +21,23 @@ class ChatController extends Controller
         if (!$query || !is_string($query)) {
             return response()->json(['reply' => 'Bạn hãy nhập câu hỏi để mình tư vấn nhé.']);
         }
+        // Nhận lịch sử hội thoại ngắn từ client (không lưu server; chỉ để giữ ngữ cảnh tạm thời)
+        $history = $request->input('history', []);
+        $historyLines = [];
+        if (is_array($history)) {
+            // Chỉ lấy tối đa 6 tin nhắn gần nhất (3 lượt trao đổi)
+            $slice = array_slice($history, -6);
+            foreach ($slice as $item) {
+                if (!is_array($item) || empty($item['text'])) continue;
+                $sender = isset($item['sender']) && $item['sender'] === 'bot' ? 'Trợ lý' : 'Khách';
+                // Cắt gọn từng dòng để tránh prompt quá dài
+                $text = trim((string) $item['text']);
+                if (mb_strlen($text) > 300) {
+                    $text = mb_substr($text, 0, 300) . '…';
+                }
+                $historyLines[] = "{$sender}: {$text}";
+            }
+        }
 
         // Lấy thông tin sản phẩm từ database để cung cấp context cho AI
         try {
@@ -44,8 +61,12 @@ class ChatController extends Controller
             return response()->json(['reply' => 'Chatbot chưa được cấu hình khóa API. Vui lòng liên hệ quản trị viên.'], 200);
         }
 
-        // Tạo prompt với context từ database
+        // Tạo prompt với context từ database và lịch sử hội thoại ngắn
         $prompt = "BẠN LÀ NHÂN VIÊN TƯ VẤN MÁY TÍNH:\n\n";
+        if (!empty($historyLines)) {
+            $prompt .= "LỊCH SỬ CUỘC HỘI THOẠI GẦN ĐÂY (để giữ ngữ cảnh):\n";
+            $prompt .= implode("\n", $historyLines) . "\n\n";
+        }
         $prompt .= $storeContext . "\n\n";
         
         if ($specificProducts && $specificProducts->count() > 0) {
@@ -57,7 +78,7 @@ class ChatController extends Controller
             $prompt .= "\n";
         }
         
-        $prompt .= "HÃY TƯ VẤN CHO KHÁCH HÀNG THEO CÂU HỎI SAU (trả lời ngắn gọn, tình cảm và dựa trên sản phẩm có sẵn):\n";
+    $prompt .= "HÃY TƯ VẤN CHO KHÁCH HÀNG THEO CÂU HỎI SAU (trả lời ngắn gọn, ấm áp, nhất quán với lịch sử, và chỉ dựa trên sản phẩm có sẵn):\n";
         $prompt .= "Câu hỏi: {$query}";
 
         // Gửi request đến Gemini API
