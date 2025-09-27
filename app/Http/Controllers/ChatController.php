@@ -18,9 +18,17 @@ class ChatController extends Controller
     public function chat(Request $request)
     {
         $query = $request->input('message');
+        if (!$query || !is_string($query)) {
+            return response()->json(['reply' => 'Bạn hãy nhập câu hỏi để mình tư vấn nhé.']);
+        }
 
         // Lấy thông tin sản phẩm từ database để cung cấp context cho AI
-        $storeContext = $this->productService->getStoreContext();
+        try {
+            $storeContext = $this->productService->getStoreContext();
+        } catch (\Throwable $e) {
+            Log::warning('Get store context failed for chatbot', ['error' => $e->getMessage()]);
+            $storeContext = "Hiện tại mình có nhiều mẫu laptop/PC văn phòng và gaming có sẵn. Bạn muốn nhu cầu như chơi game, làm việc văn phòng hay đồ họa?";
+        }
         
         // Kiểm tra nếu khách hàng hỏi về sản phẩm cụ thể
         $specificProducts = null;
@@ -31,6 +39,10 @@ class ChatController extends Controller
         // API URL & Key của Gemini
         $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
         $apiKey = env('GEMINI_API_KEY');
+        if (empty($apiKey)) {
+            Log::warning('GEMINI_API_KEY missing for chatbot');
+            return response()->json(['reply' => 'Chatbot chưa được cấu hình khóa API. Vui lòng liên hệ quản trị viên.'], 200);
+        }
 
         // Tạo prompt với context từ database
         $prompt = "BẠN LÀ NHÂN VIÊN TƯ VẤN MÁY TÍNH:\n\n";
@@ -69,7 +81,14 @@ class ChatController extends Controller
                     $reply = "Xin lỗi, có lỗi xảy ra khi xử lý phản hồi từ AI.";
                 }
             } else {
-                $reply = "Xin lỗi, không thể kết nối với dịch vụ AI.";
+                $status = $response->status();
+                $body = $response->body();
+                Log::warning('ChatBot API non-2xx response', ['status' => $status, 'body' => $body]);
+                if ($status === 429 || stripos($body, 'quota') !== false) {
+                    $reply = "Chatbot hiện tại đã vượt quá giới hạn sử dụng. Vui lòng thử lại sau 24h.";
+                } else {
+                    $reply = "Xin lỗi, không thể kết nối với dịch vụ AI.";
+                }
             }
         } catch (\Exception $e) {
             Log::error('ChatBot API error', [

@@ -1,5 +1,5 @@
 @extends('layout')
-@section('title', $product->name_translated)
+@section('title', $product->name)
 
 @section('content')
     <!-- Breadcrumb Section Start -->
@@ -38,13 +38,12 @@
                                 <div class="row g-2">
                                     <div class="col-xxl-10 col-lg-12 col-md-10 order-xxl-2 order-lg-1 order-md-2">
                                         <div class="product-main-2 no-arrow">
-
-                                            @foreach ($product->images as $key => $image)
+                                            @foreach($product->all_images as $index => $imageUrl)
                                                 <div>
                                                     <div class="slider-image">
-                                                        <img src="{{ $image->image_path }}"
-                                                            id="{{ $key == 0 ? 'img-1' : '' }}"
-                                                            data-zoom-image="{{ $image->image_path }}"
+                                                        <img src="{{ $imageUrl }}"
+                                                            id="{{ $index == 0 ? 'img-1' : '' }}"
+                                                            data-zoom-image="{{ $imageUrl }}"
                                                             class="img-fluid image_zoom_cls-0 blur-up lazyload"
                                                             alt="">
                                                     </div>
@@ -55,10 +54,10 @@
 
                                     <div class="col-xxl-2 col-lg-12 col-md-2 order-xxl-1 order-lg-2 order-md-1">
                                         <div class="left-slider-image-2 left-slider no-arrow slick-top">
-                                            @foreach ($product->images as $image)
+                                            @foreach($product->all_images as $index => $imageUrl)
                                                 <div>
                                                     <div class="sidebar-image">
-                                                        <img src="{{ $image->image_path }}"
+                                                        <img src="{{ $imageUrl }}"
                                                             class="img-fluid blur-up lazyload" alt="">
                                                     </div>
                                                 </div>
@@ -74,7 +73,7 @@
                                 <h6 class="offer-top">{{ __('product.discount') }} {!! $product->has_sale
                                     ? number_format((($product->price - $product->sale_price) / $product->price) * 100, 0)
                                     : '0' !!}%</h6>
-                                <h2 class="name">{{ $product->name_translated }}</h2>
+                                <h2 class="name">{{ $product->name }}</h2>
                                 <div class="price-rating">
                                     <h3 class="theme-color price">
                                         {{ $product->has_sale ? number_format($product->sale_price) : number_format($product->price) }}
@@ -505,15 +504,15 @@
                                             <div class="offer-product">
                                                 <a href="{{ route('product.detail', $product->id) }}"
                                                     class="offer-image">
-                                                    <img src="{{ $product?->images[0]?->image_path }}"
-                                                        class="blur-up lazyload" alt="{{ $product->name_translated }}">
+                                                    <img src="{{ $product->main_image }}"
+                                                        class="blur-up lazyload" alt="{{ $product->name }}">
                                                 </a>
 
                                                 <div class="offer-detail">
                                                     <div>
                                                         <a href="{{ route('product.detail', $product->id) }}"
                                                             class="text-title">
-                                                            <h6 class="name">{{ $product->name_translated }}</h6>
+                                                            <h6 class="name">{{ $product->name }}</h6>
                                                         </a>
                                                         <span> {{ $product->stock_quantity > 0 ? __('product.in_stock') : __('product.out_stock') }}
                                                         </span>
@@ -579,7 +578,7 @@
                                         <div class="product-header">
                                             <div class="product-image">
                                                 <a href="{{ route('product.detail', $it->id) }}">
-                                                    <img src="{{ $it->images[0]?->image_path }}"
+                                                    <img src="{{ $it->main_image }}"
                                                         class="img-fluid blur-up lazyload" alt="">
                                                 </a>
     
@@ -610,7 +609,7 @@
                                             <div class="product-detail">
                                                 <span class="span-name">{{ $it->category?->name_translated }}</span>
                                                 <a href="{{ route('product.detail', $it->id) }}">
-                                                    <h5 class="name">{{ $it->name_translated }}</h5>
+                                                    <h5 class="name">{{ $it->name }}</h5>
                                                 </a>
                                                 <div class="product-rating mt-2">
                                                     @php
@@ -632,7 +631,7 @@
                                                 </div>
     
                                                 <h6 class="theme-color mt-2">
-                                                    {{ $product->stock_quantity > 0 ? __('product.in_stock') : __('product.out_stock') }}
+                                                    {{ $it->stock_quantity > 0 ? __('product.in_stock') : __('product.out_stock') }}
                                                 </h6>
     
                                                 <h5 class="price"><span class="theme-color">{{ $it->has_sale ? number_format($it->sale_price, 0, '.', ',') : number_format($it->price, 0, '.', ',') }}
@@ -689,3 +688,4 @@
         });
     </script>
 @endsection
+

@@ -326,7 +326,7 @@
                                         <div class="product-header">
                                             <div class="product-image">
                                                 <a href="{{ route('product.detail', $it->id) }}">
-                                                    <img src="{{ $it->images[0]?->image_path }}"
+                                                    <img src="{{ $it->main_image }}"
                                                         class="img-fluid blur-up lazyload" alt="">
                                                 </a>
 
@@ -358,7 +358,7 @@
                                             <div class="product-detail">
                                                 <span class="span-name">{{ $it->category?->name_translated }}</span>
                                                 <a href="{{ route('product.detail', $it->id) }}">
-                                                    <h6 class="name h-100">{{ $it->name_translated }}</h6>
+                                                    <h6 class="name h-100">{{ $it->name }}</h6>
                                                 </a>
                                                 {{-- <p class="text-content mt-1 mb-2 product-content">
                                                     {{ $it->short_description_translated }}
@@ -471,3 +471,4 @@
         })
     </script> --}}
 @endsection
+

@@ -139,7 +139,7 @@ class PaymentByVnpay {
                 foreach ($tempOrder['carts'] as $cart) {
                     $product = Product::find($cart['product_id']);
                     if (!$product || $product->stock_quantity < $cart['quantity']) {
-                        throw new \Exception("Sản phẩm {$product->name_translated} không đủ hàng.");
+                        throw new \Exception("Sản phẩm {$product->name} không đủ hàng.");
                     }
     
                     $price = $cart['sale_price'] > 0 ? $cart['sale_price'] : $cart['price'];
@@ -155,7 +155,7 @@ class PaymentByVnpay {
     
                     $product->update([
                         'stock_quantity' => $product->stock_quantity - $cart['quantity'],
-                        'total_purchases' => $product->total_purchases + $cart['quantity']
+                        'sold_quantity' => $product->sold_quantity + $cart['quantity']
                     ]);
                 }
     

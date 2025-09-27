@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Color;
-use App\Models\Image;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -34,7 +32,7 @@ class CartController extends Controller
         if (!$product) {
             return response()->json(['message' => __('notification.product_not_exist')], 404);
         }
-        $image = Image::select('image_path')->where('product_id', $product->id)->first();
+    $imageUrl = $product->main_image;
 
         $carts = session()->get('cart', []);
 
@@ -50,8 +48,8 @@ class CartController extends Controller
 
             $carts[] = [
                 'product_id' => $product->id,
-                'product_name' => $product->name_translated,
-                'image' => $image->image_path,
+                'product_name' => $product->name,
+                'image' => $imageUrl,
                 'quantity' => $request->quantity ?? 1,
                 'price' => $product->price,
                 'sale_price' => $product->sale_price

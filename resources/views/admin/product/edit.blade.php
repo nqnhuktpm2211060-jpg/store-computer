@@ -41,7 +41,7 @@
                                     <label class="form-label">{{ __('admin.product_management.fields.name') }}</label>
                                     <input type="text" class="form-control" name="name"
                                         placeholder="{{ __('admin.product_management.placeholders.name') }}" required
-                                        value="{{ $product->translations->first()?->name ?? $product->name }}">
+                                        value="{{ $product->name_translated }}">
                                 </div>
                             </div>
                             <div class="col-sm-6 col-xl-6">
@@ -108,10 +108,10 @@
                                     <select name="category_id" class="form-select" id="" required>
                                         @foreach ($categories as $it)
                                             @if ($product->category_id == $it->id)
-                                                <option value="{{ $it->id }}" selected>{{ $it->name_translated }}
+                                                <option value="{{ $it->id }}" selected>{{ $it->name }}
                                                 </option>
                                             @else
-                                                <option value="{{ $it->id }}">{{ $it->name_translated }}</option>
+                                                <option value="{{ $it->id }}">{{ $it->name }}</option>
                                             @endif
                                         @endforeach
                                     </select>
@@ -138,13 +138,13 @@
                                     <label
                                         class="form-label">{{ __('admin.product_management.fields.short_description') }}</label>
                                     <textarea class="form-control" name="short_description" rows="3"
-                                        placeholder="{{ __('admin.product_management.placeholders.short_description') }}" required>{{ $product->translations->first()?->short_description ?? $product->short_description }}</textarea>
+                                        placeholder="{{ __('admin.product_management.placeholders.short_description') }}" required>{{ $product->short_description_translated }}</textarea>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">{{ __('admin.product_management.fields.description') }}</label>
                                 <div id="quill-editor" class="mb-3" style="height: 300px;">
-                                    {!! $product->translations->first()?->description ?? $product->description !!}
+                                    {!! $product->description_translated !!}
                                 </div>
                                 <textarea rows="3" class="mb-3 d-none" name="description" placeholder="{{ __('admin.product_management.placeholders.description') }}" id="quill-editor-area"></textarea>
                             
@@ -168,8 +168,8 @@
 
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
-        let images = <?php echo json_encode($product->images); ?>;
-        let characteristics = <?php echo json_encode($product->characteristicsTranslations); ?>;
+    let images = <?php echo json_encode($product->images ?? []); ?>;
+    let characteristics = <?php echo json_encode($product->characteristics_translated ?? []); ?>;
         let indexCharacteristics = 0
         document.addEventListener('DOMContentLoaded', function() {
             quill('quill-editor-area', '#quill-editor')
@@ -297,11 +297,10 @@
 
         function showImage(images) {
             let listImages = '';
-            images.forEach((it) => {
+            images.forEach((fileName) => {
+                const url = `${window.location.origin}/uploads/products/${fileName}`;
                 listImages += `<div style="width: 120px; position: relative" class="me-3 mb-3">
-                            <img src="${it.image_path}" width="100%" style="border: 1px solid rgb(0, 247, 255)" alt="image product">
-                            <a href="javascript:void(0);" class="btn-pc-default btn-delete-image f-18"
-                               style="position: absolute; top: -14px; right: -4px;" data-id="${it.id}">x</a>
+                            <img src="${url}" width="100%" style="border: 1px solid rgb(0, 247, 255)" alt="image product">
                         </div>`;
             });
 
@@ -309,42 +308,7 @@
 
             productImagesElement.innerHTML = listImages;
         }
-        document.addEventListener('DOMContentLoaded', () => {
-            const productImagesElement = document.getElementById('product-images');
-
-            productImagesElement.addEventListener('click', (event) => {
-                if (event.target.classList.contains('btn-delete-image')) {
-                    const imageId = event.target.getAttribute('data-id');
-                    if (imageId) {
-                        deleteImage(imageId);
-                    }
-                }
-            });
-        });
-        async function deleteImage(imageId) {
-            try {
-                const response = await fetch(`{{ route('admin.product.image.delete', ':id') }}`.replace(':id',
-                    imageId), {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    }
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    alert('{{ __('admin.product_management.messages.delete_image_error') }}');
-                    return;
-                }
-
-                showImage(data.images);
-            } catch (error) {
-                console.error('Có lỗi xảy ra khi thực hiện yêu cầu xóa ảnh:', error);
-                alert('{{ __('admin.product_management.messages.delete_image_error') }}');
-            }
-        }
-
+        // Note: Image deletion for JSON-based images is not implemented here to keep changes minimal.
         function showCharacteristics(characteristics) {
             listCharacteristics = '';
             characteristics.forEach((it, index) => {
@@ -400,42 +364,12 @@
 
         document.getElementById('product-characteristics').addEventListener('click', (e) => {
             if (e.target.closest('.remove-characteristics')) {
-                const characteristicId = e.target.closest('.remove-characteristics').getAttribute("data-id");
-                console.log(characteristicId);
-
-                if (characteristicId) {
-                    deleteCharacteristic(characteristicId);
-                }
                 e.target.closest('.row').remove();
             }
 
         });
 
-        async function deleteCharacteristic(id) {
-            try {
-                const response = await fetch(`{{ route('admin.product.color.characteristic', ':id') }}`.replace(':id',
-                    id), {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    }
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    alert('{{ __('admin.product_management.messages.delete_characteristic_error') }}');
-                    return;
-                }
-
-            } catch (error) {
-                console.error('Có lỗi xảy ra khi thực hiện yêu cầu xóa ảnh:', error);
-                alert('{{ __('admin.product_management.messages.delete_characteristic_error') }}');
-                return;
-            }
-        }
-
-        showImage(images);
-        showCharacteristics(characteristics);
+    showImage(images);
+    showCharacteristics(characteristics);
     </script>
 @endsection

@@ -24,7 +24,7 @@ class DealToday extends Component
      */
     public function render(): View|Closure|string
     {
-        $dealTodayProducts = Product::with('images')
+    $dealTodayProducts = Product::query()
                                 ->where('sale_price', '>', 0)
                                 ->where('stock_quantity', '>', 0)
                                 ->whereDate('updated_at', Carbon::today())

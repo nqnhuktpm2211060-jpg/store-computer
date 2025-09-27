@@ -94,7 +94,7 @@ class PaymentController extends Controller
                 $product = Product::find($cart['product_id']);
                 if($product->stock_quantity < $cart['quantity']){
                     DB::rollback();
-                    throw new \Exception("Sản phẩm {$product->name_translated} không đủ hàng!");
+                    throw new \Exception("Sản phẩm {$product->name} không đủ hàng!");
                 }
                 $total += $cart['quantity'] * ($cart['sale_price'] > 0 ? $cart['sale_price'] : $cart['price']);
                 OrderItem::create([
@@ -105,7 +105,7 @@ class PaymentController extends Controller
                 ]);
 
                 $product->update([
-                    'total_purchases' => $product->total_purchases + $cart['quantity'],
+                    'sold_quantity' => $product->sold_quantity + $cart['quantity'],
                     'stock_quantity' => $product->stock_quantity - $cart['quantity']
                 ]);
             }

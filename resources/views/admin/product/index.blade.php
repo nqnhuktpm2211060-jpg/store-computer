@@ -59,15 +59,15 @@
                                 @forelse ($products as $product)
                                     <tr>
                                         <td>{{ $product->id }}</td>
-                                        <td>{{ $product->name_translated }}</td>
+                                        <td>{{ $product->name }}</td>
                                         <td>
-                                            <img src="{{ $product->images[0] ? $product->images[0]->image_path : '#' }}"
+                                            <img src="{{ $product->main_image }}"
                                                 width="60px" alt="{{ __('admin.product_management.table.product_image') }}">
                                         </td>
                                         <td>{{ number_format($product->price, 0, '.', ',') }} đ</td>
                                         <td>{{ number_format($product->sale_price, 0, '.', ',') }} đ</td>
                                         <td>{{ $product->stock_quantity }}</td>
-                                        <td>{{ $product->total_purchases }}</td>
+                                        <td>{{ $product->sold_quantity }}</td>
                                         <td>
                                             <a href="{{ route('product.detail', $product->id) }}"
                                                 class="avtar avtar-details avtar-xs btn-link-secondary"
@@ -80,7 +80,7 @@
                                                 <i class="ti ti-edit f-20"></i>
                                             </a>
                                             <a href="#!" class="avtar avtar-delete avtar-xs btn-link-secondary"
-                                                data-name="{{ $product->name_translated }}" data-id="{{ $product->id }}"
+                                                data-name="{{ $product->name }}" data-id="{{ $product->id }}"
                                                 title="{{ __('admin.product_management.table.delete_order') }}">
                                                 <i class="ti ti-trash f-20"></i>
                                             </a>
@@ -181,7 +181,7 @@
                                                         required>
                                                         <option value="">{{__('admin.product_management.placeholders.category')}}</option>
                                                         @foreach ($categories as $it)
-                                                            <option value="{{ $it->id }}">{{ $it->name_translated }}
+                                                            <option value="{{ $it->id }}">{{ $it->name }}
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -443,3 +443,4 @@
         });
     </script>
 @endsection
+

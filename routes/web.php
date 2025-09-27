@@ -88,9 +88,7 @@ Route::middleware('set_locale')->group(function () {
         Route::post('thay-doi-trang-thai/{id}', [OrderController::class, 'changeStatus'])->name('order.changeStatus');
         Route::delete('xoa-don-hang/{id}', [OrderController::class, 'delete'])->name('order.delete');
 
-        Route::resource('quan-ly-san-pham', AdminProductController::class)->except(['index', 'edit'])->names('admin.products');
-        Route::delete('quan-ly-san-pham/{id}/xoa-anh', [AdminProductController::class, 'deleteImage'])->name('admin.product.image.delete');
-        Route::delete('quan-ly-san-pham/{id}/xoa-dac-diem', [AdminProductController::class, 'deleteCharacteristic'])->name('admin.product.color.characteristic');
+    Route::resource('quan-ly-san-pham', AdminProductController::class)->except(['index', 'edit'])->names('admin.products');
         Route::post('/upload-image-product', [AdminProductController::class, 'uploadImageDescription'])->name('upload.image.product');
 
         Route::resource('quan-ly-bai-viet', PostController::class)->except(['index'])->names('admin.posts');

@@ -245,7 +245,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0">
                                         <div class="avtar avtar-s border">
-                                            <img src="{{ $it->product?->images[0]->image_path }}" width="30px" alt="">
+                                            <img src="{{ $it->product->main_image }}" width="30px" alt="">
                                         </div>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
@@ -343,3 +343,4 @@
         renderChartDailyRevenue();
     </script>
 @endsection
+

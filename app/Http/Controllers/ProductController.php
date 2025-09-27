@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductView;
 use App\Models\Review;
 use Illuminate\Http\Request;
 
@@ -14,7 +13,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $productQuery = Product::with('reviews', 'images', 'category', 'translations');
+        $productQuery = Product::with('reviews', 'category');
         $categoryQuery = Category::with('products', 'translations');
         if ($request->category_l1) {
             $productQuery->whereHas('category.categoryParent', function ($query) use ($request) {
@@ -27,9 +26,7 @@ class ProductController extends Controller
             });
         }
         if ($request->search) {
-            $productQuery->where('name', 'like', '%' . $request->search . '%')->orWhereHas('translations', function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->search . '%');
-            });
+            $productQuery->where('name', 'like', '%' . $request->search . '%');
         }
         // $minPrice = 10000;
         // $maxPrice = 10000000;
@@ -51,7 +48,7 @@ class ProductController extends Controller
         // ->take(10)
         // ->get();
 
-        $products = $productQuery->orderBy('created_at', 'desc')->paginate(14);
+    $products = $productQuery->orderBy('created_at', 'desc')->paginate(14);
 
         $categories = $categoryQuery->orderBy('name')->get();
         return view('pages.products.index', compact('products', 'categories'));
@@ -60,7 +57,7 @@ class ProductController extends Controller
     public function quickView($id)
     {
         try {
-            $product = Product::with('reviews', 'category', 'images', 'translations')->findOrFail($id);
+            $product = Product::with('reviews', 'category')->findOrFail($id);
 
             return view('pages.products.quick_view', compact('product'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -76,7 +73,7 @@ class ProductController extends Controller
     public function productDetail($id)
     {
         try {
-            $product = Product::with('reviews', 'category', 'images', 'translations', 'characteristicsTranslations', 'characteristics')->find($id);
+            $product = Product::with('reviews', 'category')->find($id);
 
             if (!$product) {
                 return abort(404);
@@ -84,11 +81,9 @@ class ProductController extends Controller
 
             $product->increment('view_count');
 
-            ProductView::create([
-                'product_id' => $product->id
-            ]);
+            // Track view count directly on product; separate ProductView model no longer used
 
-            $relatedProducts = Product::with('reviews', 'category', 'images', 'translations')->where('category_id', $product->category_id)
+            $relatedProducts = Product::with('reviews', 'category')->where('category_id', $product->category_id)
                 ->where('id', '!=', $product->id)
                 ->orderBy('created_at', 'desc')
                 ->take(10)->get();
@@ -97,7 +92,7 @@ class ProductController extends Controller
             $suggestedProducts = collect();
 
             foreach ($categories as $category) {
-                $suggestedProduct = Product::with('translations')->where('category_id', $category->id)
+                $suggestedProduct = Product::query()->where('category_id', $category->id)
                     ->where('id', '!=', $product->id)
                     ->inRandomOrder()
                     ->first();

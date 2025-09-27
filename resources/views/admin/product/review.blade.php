@@ -59,7 +59,7 @@
                                             {{ $review->product?->name_translated }}
                                         </td>
                                         <td>
-                                            <img src="{{ optional($review->product?->images?->first())->image_path }}"
+                                            <img src="{{ $review->product->main_image ?? "" }}"
                                                 width="40px" alt="image product">
                                         </td>
                                         <td>
@@ -215,3 +215,4 @@
         </div>
     @endforeach
 @endsection
+

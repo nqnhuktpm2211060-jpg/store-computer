@@ -21,7 +21,7 @@
                                 <tr>
                                     <td>{{ $it->order_id }}</td>
                                     <td>{{ $it->product?->name_translated }}</td>
-                                    <td><img src="{{ $it->product?->images ? $it->product->images->first()->image_path : '' }}" width="60px" alt="anh sp"></td>
+                                    <td><img src="{{ $it->product->main_image ?? "" }}" width="60px" alt="anh sp"></td>
                                     <td>{{ $it->quantity }}</td>
                                     <td>{{ number_format($it->total_price, 0, '.', ',') }} đ</td>
                                 </tr>
@@ -42,3 +42,4 @@
         </div>
     </div>
 </div>
+

@@ -9,7 +9,7 @@
             <div class="row g-sm-4 g-2">
                 <div class="col-lg-6">
                     <div class="slider-image">
-                        <img src="{{ $product->images[0]?->image_path }}" style="width: 100%"
+                        <img src="{{ $product->main_image }}" style="width: 100%"
                             class="img-fluid blur-up lazyload" alt="{{__('product.product_image')}}">
                     </div>
                 </div>
@@ -18,7 +18,7 @@
                     <form class="form-add-to-cart" method="post">
                         <input type="text" name="product_id" hidden value="{{ $product->id }}">
                         <div class="right-sidebar-modal">
-                            <h4 class="title-name">{{ $product->name_translated }}</h4>
+                            <h4 class="title-name">{{ $product->name }}</h4>
                             <h4 class="price">
                                 {{ $product->has_sale
                                     ? number_format($product->sale_price, 0, '.', ',')
@@ -94,3 +94,4 @@
 <script>
     addToCart();
 </script>
+

@@ -4,28 +4,46 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\App;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'short_description', 'description', 'price', 'stock_quantity', 'category_id', 'total_purchases', 'is_on_featured', 'sale_price', 'view_count'];
+    
+    protected $fillable = [
+        'name', 'slug', 'short_description', 'description',
+        'price', 'sale_price', 'discount_percent',
+        'stock_quantity', 'sold_quantity',
+        'category_id', 'category_name',
+        'images', 'featured_image',
+        'specifications',
+        'meta_title', 'meta_description', 'meta_keywords',
+        'is_featured', 'is_active', 'is_hot', 'is_new',
+        'view_count', 'rating_average', 'rating_count',
+        'translations',
+        'brand', 'model', 'sku',
+        'weight', 'dimensions'
+    ];
 
+    protected $casts = [
+        'images' => 'array',
+        'specifications' => 'array',
+        'translations' => 'array',
+        'price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
+        'weight' => 'decimal:2',
+        'rating_average' => 'decimal:1',
+        'is_featured' => 'boolean',
+        'is_active' => 'boolean',
+        'is_hot' => 'boolean',
+        'is_new' => 'boolean',
+    ];
 
+    // Relationships
     public function category()
     {
         return $this->belongsTo(Category::class);
-    }
-
-    public function images()
-    {
-        return $this->hasMany(Image::class);
-    }
-
-    public function characteristics()
-    {
-        return $this->hasMany(ProductCharacteristics::class);
     }
 
     public function reviews()
@@ -33,47 +51,162 @@ class Product extends Model
         return $this->hasMany(Review::class)->where('status', 1);
     }
 
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    // Accessors
+    public function getCurrentPriceAttribute()
+    {
+        return $this->sale_price > 0 ? $this->sale_price : $this->price;
+    }
+
     public function getHasSaleAttribute()
     {
-        return (float) $this->sale_price > 0;
+        return $this->sale_price > 0 && $this->sale_price < $this->price;
     }
 
-    public function views()
+    public function getDiscountAmountAttribute()
     {
-        return $this->hasMany(ProductView::class);
+        if ($this->has_sale) {
+            return $this->price - $this->sale_price;
+        }
+        return 0;
     }
 
-    public function translations()
+    public function getIsInStockAttribute()
     {
-        return $this->hasMany(ProductTranslation::class);
+        return $this->stock_quantity > 0;
     }
 
+    public function getFormattedPriceAttribute()
+    {
+        return number_format($this->current_price, 0, '.', ',') . 'đ';
+    }
+
+    public function getFormattedOriginalPriceAttribute()
+    {
+        return number_format($this->price, 0, '.', ',') . 'đ';
+    }
+
+    // Helper methods for JSON fields
+    public function getMainImageAttribute()
+    {
+        if ($this->featured_image) {
+            return asset('uploads/products/' . $this->featured_image);
+        }
+        
+        $images = $this->images;
+        if (is_array($images) && !empty($images)) {
+            return asset('uploads/products/' . $images[0]);
+        }
+        
+        return asset('assets/images/no-image.jpg');
+    }
+
+    public function getAllImagesAttribute()
+    {
+        $allImages = [];
+
+        if ($this->featured_image) {
+            $allImages[] = asset('uploads/products/' . $this->featured_image);
+        }
+
+        if (is_array($this->images)) {
+            foreach ($this->images as $image) {
+                $allImages[] = asset('uploads/products/' . $image);
+            }
+        }
+
+        return array_values(array_unique($allImages));
+    }
+
+    public function getSpecificationValueAttribute($key)
+    {
+        $specs = $this->specifications;
+        return is_array($specs) && isset($specs[$key]) ? $specs[$key] : null;
+    }
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    public function scopeInStock($query)
+    {
+        return $query->where('stock_quantity', '>', 0);
+    }
+
+    public function scopeByCategory($query, $categoryId)
+    {
+        return $query->where('category_id', $categoryId);
+    }
+
+    public function scopeSearch($query, $keyword)
+    {
+        return $query->where(function($q) use ($keyword) {
+            $q->where('name', 'LIKE', "%{$keyword}%")
+              ->orWhere('short_description', 'LIKE', "%{$keyword}%")
+              ->orWhere('description', 'LIKE', "%{$keyword}%")
+              ->orWhere('brand', 'LIKE', "%{$keyword}%")
+              ->orWhere('model', 'LIKE', "%{$keyword}%");
+        });
+    }
+
+    // Auto-generate slug
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($product) {
+            $product->slug = Str::slug($product->name);
+        });
+        
+        static::updating(function ($product) {
+            if ($product->isDirty('name')) {
+                $product->slug = Str::slug($product->name);
+            }
+        });
+    }
+
+    // Translated helpers (from translations JSON)
     public function getNameTranslatedAttribute()
     {
-        return $this->translations->where('language_code', App::getLocale())->first()->name ?? $this->name;
-    }
-
-    public function getDescriptionTranslatedAttribute()
-    {
-        return $this->translations->where('language_code', App::getLocale())->first()->description ?? $this->description;
+        $locale = app()->getLocale();
+        $trans = is_array($this->translations) ? ($this->translations[$locale] ?? null) : null;
+        return $trans['name'] ?? $this->name;
     }
 
     public function getShortDescriptionTranslatedAttribute()
     {
-        return $this->translations->where('language_code', App::getLocale())->first()->short_description ?? $this->short_description;
+        $locale = app()->getLocale();
+        $trans = is_array($this->translations) ? ($this->translations[$locale] ?? null) : null;
+        return $trans['short_description'] ?? $this->short_description;
     }
 
-    public function characteristicsTranslations()
+    public function getDescriptionTranslatedAttribute()
     {
-        return $this->hasMany(ProductCharacteristicTranslation::class);
+        $locale = app()->getLocale();
+        $trans = is_array($this->translations) ? ($this->translations[$locale] ?? null) : null;
+        return $trans['description'] ?? $this->description;
     }
 
+    // Characteristics derived from specifications JSON
     public function getCharacteristicsTranslatedAttribute()
     {
-        $translated = $this->characteristicsTranslations->where('language_code', App::getLocale());
-
-        return $translated->isNotEmpty()
-            ? $translated
-            : $this->characteristics;
+        // Return as array of objects with name and description keys to keep blade compatibility
+        $specs = is_array($this->specifications) ? $this->specifications : [];
+        $list = [];
+        foreach ($specs as $name => $description) {
+            $list[] = (object) ['name' => $name, 'description' => $description];
+        }
+        return $list;
     }
 }

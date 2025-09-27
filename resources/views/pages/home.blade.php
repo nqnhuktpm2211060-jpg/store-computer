@@ -225,15 +225,15 @@
                                             <div class="offer-product">
                                                 <a href="{{ route('product.detail', $product->id) }}"
                                                     class="offer-image">
-                                                    <img src="{{ $product?->images[0]?->image_path }}"
-                                                        class="blur-up lazyload" alt="{{ $product->name_translated }}">
+                                                    <img src="{{ $product->main_image }}"
+                                                        class="blur-up lazyload" alt="{{ $product->name }}">
                                                 </a>
 
                                                 <div class="offer-detail">
                                                     <div>
                                                         <a href="{{ route('product.detail', $product->id) }}"
                                                             class="text-title">
-                                                            <h6 class="name">{{ $product->name_translated }}</h6>
+                                                            <h6 class="name">{{ $product->name }}</h6>
                                                         </a>
                                                         <span>
                                                             {{ $product->stock_quantity > 0 ? __('home.in_stock') : __('home.out_of_stock') }}
@@ -321,7 +321,7 @@
                                                     <div class="product-box">
                                                         <div class="product-image">
                                                             <a href="{{ route('product.detail', $it->id) }}">
-                                                                <img src="{{ $it->images[0]?->image_path }}"
+                                                                <img src="{{ $it->main_image }}"
                                                                     class="img-fluid blur-up lazyload" alt="">
                                                             </a>
                                                             <ul class="product-option">
@@ -350,7 +350,7 @@
                                                         </div>
                                                         <div class="product-detail">
                                                             <a href="{{ route('product.detail', $it->id) }}">
-                                                                <h6 class="name h-100">{{ $it->name_translated }}</h6>
+                                                                <h6 class="name h-100">{{ $it->name }}</h6>
                                                             </a>
 
                                                             <h5 class="sold text-content">
@@ -489,7 +489,7 @@
                                                 <div class="product-box">
                                                     <div class="product-image">
                                                         <a href="{{ route('product.detail', $it->id) }}">
-                                                            <img src="{{ $it->images[0]?->image_path }}"
+                                                            <img src="{{ $it->main_image }}"
                                                                 class="img-fluid blur-up lazyload" alt="">
                                                         </a>
                                                         <ul class="product-option">
@@ -518,7 +518,7 @@
                                                     </div>
                                                     <div class="product-detail">
                                                         <a href="{{ route('product.detail', $it->id) }}">
-                                                            <h6 class="name h-100">{{ $it->name_translated }}</h6>
+                                                            <h6 class="name h-100">{{ $it->name }}</h6>
                                                         </a>
 
                                                         <h5 class="sold text-content">
@@ -632,15 +632,15 @@
                                             <div class="offer-product">
                                                 <a href="{{ route('product.detail', $product->id) }}"
                                                     class="offer-image">
-                                                    <img src="{{ $product?->images[0]?->image_path }}"
-                                                        class="blur-up lazyload" alt="{{ $product->name_translated }}">
+                                                    <img src="{{ $product->main_image }}"
+                                                        class="blur-up lazyload" alt="{{ $product->name }}">
                                                 </a>
 
                                                 <div class="offer-detail">
                                                     <div>
                                                         <a href="{{ route('product.detail', $product->id) }}"
                                                             class="text-title">
-                                                            <h6 class="name">{{ $product->name_translated }}</h6>
+                                                            <h6 class="name">{{ $product->name }}</h6>
                                                         </a>
                                                         <span>
                                                             {{ $product->stock_quantity > 0 ? __('home.in_stock') : __('home.out_of_stock') }}
@@ -761,3 +761,4 @@
         })
     </script>
 @endsection
+

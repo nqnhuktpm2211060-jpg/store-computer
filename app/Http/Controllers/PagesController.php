@@ -16,16 +16,13 @@ class PagesController extends Controller
     {
         $news = Blog::OrderBy('created_at', 'desc')->take(4)->get();
 
-        $categories = Category::with('categoryChilden', 'translations')->where('level', 1)->OrderBy('name')->get();
+    $categories = Category::with('categoryChilden')->where('level', 1)->OrderBy('name')->get();
 
-        $saleProducts = Product::with('reviews', 'images', 'translations')->where('sale_price', '>', 0)->orderByDesc('created_at')->take(16)->get();
+    $saleProducts = Product::with('reviews')->where('sale_price', '>', 0)->orderByDesc('created_at')->take(16)->get();
 
-        $bestSellingProducts = Product::with('images', 'translations')->OrderBy('total_purchases')->take(16)->get();
+    $bestSellingProducts = Product::query()->orderByDesc('sold_quantity')->take(16)->get();
 
-        $trendingProduct = Product::with('images', 'translations')->withCount([
-            'views as recent_views' => function ($query) {
-                $query->where('created_at', '>=', now()->subDays(3));
-            },
+        $trendingProduct = Product::withCount([
             'reviews as review_count',
         ])
             ->withAvg('reviews as avg_rating', 'rating')
@@ -33,7 +30,6 @@ class PagesController extends Controller
             ->get()
             ->map(function ($product) {
                 $score =
-                    ($product->recent_views ?? 0) * 1 +
                     $product->sold_quantity * 0.5 +
                     ($product->avg_rating ?? 0) * 5 +
                     ($product->review_count ?? 0) * 1;
@@ -47,7 +43,7 @@ class PagesController extends Controller
             ->sortByDesc('trending_score')
             ->take(16);
 
-        $productCupboard = Product::with('category.categoryParent', 'reviews', 'images', 'translations')->whereHas('category.categoryParent', function ($query) {
+        $productCupboard = Product::with('category.categoryParent', 'reviews')->whereHas('category.categoryParent', function ($query) {
             $query->whereIn('name', ['Tạp Hóa & Hàng Thiết Yếu']);
         })->orderByDesc('created_at')->take(16)->get();
 
@@ -56,18 +52,18 @@ class PagesController extends Controller
 
     public function hotDeal(Request $request)
     {
-        $productQuery = Product::with('reviews', 'images', 'category', 'translations')
+        $productQuery = Product::with('reviews', 'category')
             ->select('*')
             ->selectRaw('
             (
-                (total_purchases * 2 + view_count) / GREATEST(stock_quantity, 1)
+                ((sold_quantity * 2) + view_count) / GREATEST(stock_quantity, 1)
                 * CASE
                     WHEN sale_price > 0 THEN price / sale_price
                     ELSE 1
                 END
             ) as hot_score
         ');
-        $categoryQuery = Category::with('products', 'translations');
+        $categoryQuery = Category::with('products');
         if ($request->category_l1) {
             $productQuery->whereHas('category.categoryParent', function ($query) use ($request) {
                 $query->where('name', $request->category_l1);
@@ -92,8 +88,8 @@ class PagesController extends Controller
 
     public function promotion(Request $request)
     {
-        $productQuery = Product::with('reviews', 'images', 'category', 'translations')->where('sale_price', '>', 0);
-        $categoryQuery = Category::with('products', 'translations');
+    $productQuery = Product::with('reviews', 'category')->where('sale_price', '>', 0);
+    $categoryQuery = Category::with('products');
         if ($request->category_l1) {
             $productQuery->whereHas('category.categoryParent', function ($query) use ($request) {
                 $query->where('name', $request->category_l1);

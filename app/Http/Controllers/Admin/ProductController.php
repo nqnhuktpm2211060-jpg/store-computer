@@ -4,12 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\Image;
 use App\Models\Language;
 use App\Models\Product;
-use App\Models\ProductCharacteristics;
-use App\Models\ProductCharacteristicTranslation;
-use App\Models\ProductTranslation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +16,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $productQuery = Product::with('images', 'translations');
+        $productQuery = Product::query();
 
         if ($request->name) {
             $productQuery->where('name', 'like', '%' . $request->name . '%');
@@ -49,14 +45,14 @@ class ProductController extends Controller
     {
 
         $request->validate([
-            'name' => 'required',
-            'language' => 'required',
+            'name' => 'required|string',
+            'language' => 'required|string',
             'price' => 'required',
-            'stock_quantity' => 'required',
-            'category_id' => 'required',
+            'stock_quantity' => 'required|integer',
+            'category_id' => 'required|integer',
             'images' => 'required|array',
             'images.*' => 'file|mimes:png,jpeg,gif,jpg,webp',
-            'characteristics' => 'required|array'
+            'characteristics' => 'nullable|array'
         ]);
 
         try {
@@ -64,42 +60,54 @@ class ProductController extends Controller
             $price = preg_replace('/[^0-9]/', '', $request->price);
             $sale_price = $request->sale_price ? preg_replace('/[^0-9]/', '', $request->sale_price) : 0;
 
-            $product = Product::create([
-                'price' => $price,
-                'stock_quantity' => $request->stock_quantity,
-                'category_id' => $request->category_id,
-                'sale_price' => $sale_price
-            ]);
-
-            $product->translations()->create([
-                'language_code' => $request->language,
-                'name' => $request->name,
-                'short_description' => $request->short_description,
-                'description' => $request->description,
-            ]);
-
+            // Handle images upload to JSON array
+            $images = [];
+            $featuredImage = null;
             if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $img) {
+                foreach ($request->file('images') as $idx => $img) {
                     if ($img->isValid()) {
                         $fileName = time() . '-' . $img->getClientOriginalName();
-                        $filePath = '/uploads/products/' . $fileName;
                         $img->move(public_path('uploads/products'), $fileName);
-
-                        Image::create([
-                            'product_id' => $product->id,
-                            'image_path' => $filePath
-                        ]);
+                        $images[] = $fileName;
+                        if ($idx === 0) {
+                            $featuredImage = $fileName;
+                        }
                     }
                 }
             }
-            $dataCharacteristics = [];
-            foreach ($request->characteristics as $characteristic) {
-                $dataCharacteristics[] = array_merge($characteristic, [
-                    'language_code' => $request->language
-                ]);
+
+            // Map characteristics to specifications (key => value)
+            $specifications = [];
+            if (is_array($request->characteristics)) {
+                foreach ($request->characteristics as $characteristic) {
+                    if (!empty($characteristic['name'])) {
+                        $specifications[$characteristic['name']] = $characteristic['description'] ?? '';
+                    }
+                }
             }
 
-            $product->characteristicsTranslations()->createMany($dataCharacteristics);
+            $translations = [
+                $request->language => [
+                    'name' => $request->name,
+                    'short_description' => $request->short_description,
+                    'description' => $request->description,
+                ]
+            ];
+
+            $product = Product::create([
+                'name' => $request->name,
+                'short_description' => $request->short_description,
+                'description' => $request->description,
+                'price' => $price,
+                'sale_price' => $sale_price,
+                'stock_quantity' => $request->stock_quantity,
+                'category_id' => $request->category_id,
+                'images' => $images,
+                'featured_image' => $featuredImage,
+                'specifications' => $specifications,
+                'translations' => $translations,
+                'is_active' => true,
+            ]);
 
             DB::commit();
 
@@ -125,17 +133,7 @@ class ProductController extends Controller
     {
         $language = $request->input('language', app()->getLocale());
 
-        $product = Product::with([
-            'images',
-            'category',
-            'translations' => function ($query) use ($language) {
-                $query->where('language_code', $language);
-            },
-            'characteristicsTranslations' => function ($query) use ($language) {
-                $query->where('language_code', $language);
-            },
-            'characteristics'
-        ])->find($id);
+        $product = Product::with(['category', 'reviews'])->find($id);
 
         if (!$product) {
             return redirect()->back()->with('error', 'Sản phẩm không tồn tại');
@@ -154,14 +152,14 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string',
             'price' => 'required',
-            'language' => 'required',
-            'stock_quantity' => 'required',
-            'category_id' => 'required',
+            'language' => 'required|string',
+            'stock_quantity' => 'required|integer',
+            'category_id' => 'required|integer',
             'images' => 'nullable|array',
             'images.*' => 'file|mimes:png,jpeg,gif,jpg,webp',
-            'characteristics' => 'required|array'
+            'characteristics' => 'nullable|array'
         ]);
 
         try {
@@ -174,46 +172,54 @@ class ProductController extends Controller
             $price = preg_replace('/[^0-9]/', '', $request->price);
             $sale_price = $request->sale_price ? preg_replace('/[^0-9]/', '', $request->sale_price) : 0;
 
+            // Update basic fields
             $product->update([
+                'name' => $request->name,
+                'short_description' => $request->short_description,
+                'description' => $request->description,
                 'price' => $price,
                 'stock_quantity' => $request->stock_quantity,
                 'category_id' => $request->category_id,
                 'sale_price' => $sale_price
             ]);
 
-            ProductTranslation::updateOrCreate([
-                'product_id' => $product->id,
-                'language_code' => $request->language
-            ], [
-                'name' => $request->name,
-                'short_description' => $request->short_description,
-                'description' => $request->description
-            ]);
-
-
+            // Append new uploaded images if any
+            $images = is_array($product->images) ? $product->images : [];
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $img) {
                     if ($img->isValid()) {
                         $fileName = time() . '-' . $img->getClientOriginalName();
-                        $filePath = '/uploads/products/' . $fileName;
                         $img->move(public_path('uploads/products'), $fileName);
-
-                        Image::create([
-                            'product_id' => $product->id,
-                            'image_path' => $filePath
-                        ]);
+                        $images[] = $fileName;
+                        if (!$product->featured_image) {
+                            $product->featured_image = $fileName;
+                        }
                     }
                 }
             }
+            $product->images = $images;
 
-            $product->characteristicsTranslations()->where('language_code', $request->language)->delete();
-            $dataCharacteristics = [];
-            foreach ($request->characteristics as $characteristic) {
-                $dataCharacteristics[] = array_merge($characteristic, [
-                    'language_code' => $request->language
-                ]);
+            // Update specifications from characteristics array
+            if (is_array($request->characteristics)) {
+                $specifications = [];
+                foreach ($request->characteristics as $characteristic) {
+                    if (!empty($characteristic['name'])) {
+                        $specifications[$characteristic['name']] = $characteristic['description'] ?? '';
+                    }
+                }
+                $product->specifications = $specifications;
             }
-            $product->characteristicsTranslations()->createMany($dataCharacteristics);
+
+            // Merge translations JSON for provided language
+            $translations = is_array($product->translations) ? $product->translations : [];
+            $translations[$request->language] = [
+                'name' => $request->name,
+                'short_description' => $request->short_description,
+                'description' => $request->description,
+            ];
+            $product->translations = $translations;
+
+            $product->save();
 
             return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công');
         } catch (\Exception $e) {
@@ -237,18 +243,21 @@ class ProductController extends Controller
 
             $product->delete();
 
-            foreach ($product->images as $image) {
-                if ($image->image_path && file_exists(public_path($image->image_path))) {
-                    unlink(public_path($image->image_path));
+            // Xóa ảnh từ JSON field
+            if ($product->images && is_array($product->images)) {
+                foreach ($product->images as $image) {
+                    if ($image && file_exists(public_path('uploads/products/' . $image))) {
+                        unlink(public_path('uploads/products/' . $image));
+                    }
                 }
             }
+            
+            // Xóa featured image
+            if ($product->featured_image && file_exists(public_path('uploads/products/' . $product->featured_image))) {
+                unlink(public_path('uploads/products/' . $product->featured_image));
+            }
 
-            $product->translations()->delete();
-            $product->images()->delete();
             $product->reviews()->delete();
-            $product->characteristics()->delete();
-            $product->characteristicsTranslations()->delete();
-            $product->views()->delete();
 
             DB::commit();
 
@@ -259,44 +268,7 @@ class ProductController extends Controller
         }
     }
 
-    public function deleteImage($id)
-    {
-        $image = Image::find($id);
-
-        if (!$image) {
-            return response()->json([
-                'masaage' => 'Image not found'
-            ], 404);
-        }
-        $image->delete();
-        if ($image->image_path && file_exists(public_path($image->image_path))) {
-            unlink(public_path($image->image_path));
-        }
-
-
-        $images = Image::where('product_id', $image->product_id)->get();
-
-        return response()->json([
-            'masaage' => 'Xóa ảnh thành công',
-            'images' => $images,
-        ], 200);
-    }
-
-    public function deleteCharacteristic($id)
-    {
-        $characteristic = ProductCharacteristics::find($id);
-
-        if (!$characteristic) {
-            return response()->json([
-                'masaage' => 'Không tìm thấy đặc điểm'
-            ], 404);
-        }
-        $characteristic->delete();
-
-        return response()->json([
-            'masaage' => 'Xóa đặc điểm thành công',
-        ], 200);
-    }
+    // Legacy endpoints using old tables have been removed as data is consolidated into JSON fields.
 
     public function uploadImageDescription(Request $request){
         if ($request->hasFile('image')) {
