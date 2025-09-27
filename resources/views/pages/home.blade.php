@@ -149,7 +149,7 @@
                                 @foreach ($categories as $category)
                                     <li class="{{ $loop->last ? 'pb-30' : '' }}">
                                         <div class="category-list">
-                                            <img src="{{ $category->icon }}" class="blur-up lazyload" alt="">
+                                            <img src="{{ $category->icon_url }}" class="blur-up lazyload" alt="">
                                             <h5>
                                                 <a
                                                     href="{{ route('product.index', ['category' => $category->name]) }}">{{ $category->name_translated }}</a>
@@ -421,7 +421,7 @@
                                 <a href="{{ route('product.index', ['category' => $category->name]) }}"
                                     class="category-box category-dark">
                                     <div>
-                                        <img src="{{ $category->icon }}" class="blur-up lazyload" alt="">
+                                        <img src="{{ $category->icon_url }}" class="blur-up lazyload" alt="">
                                         <h5>{{ $category->name_translated }}</h5>
                                     </div>
                                 </a>

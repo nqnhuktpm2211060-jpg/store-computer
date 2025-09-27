@@ -43,7 +43,7 @@
                                     <a
                                         href="{{ route('product.index', array_merge(request()->query(), ['category_l1' => $category->name])) }}">
                                         <div class="shop-category-image">
-                                            <img src="{{ $category->icon }}" class="blur-up lazyload" alt="">
+                                            <img src="{{ $category->icon_url }}" class="blur-up lazyload" alt="">
                                         </div>
                                         <div class="category-box-name">
                                             <h6>{{ $category->name_translated }}</h6>
