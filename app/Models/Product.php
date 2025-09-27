@@ -91,17 +91,34 @@ class Product extends Model
     }
 
     // Helper methods for JSON fields
+    protected function normalizeImageUrl($value)
+    {
+        if (!$value) return asset('assets/images/no-image.jpg');
+        // If already absolute URL
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
+        }
+        // Normalize slashes
+        $value = ltrim($value, '/');
+        // If already starts with uploads/
+        if (Str::startsWith($value, 'uploads/')) {
+            return asset($value);
+        }
+        // Otherwise treat as filename under uploads/products
+        return asset('uploads/products/' . $value);
+    }
+
     public function getMainImageAttribute()
     {
         if ($this->featured_image) {
-            return asset('uploads/products/' . $this->featured_image);
+            return $this->normalizeImageUrl($this->featured_image);
         }
-        
+
         $images = $this->images;
         if (is_array($images) && !empty($images)) {
-            return asset('uploads/products/' . $images[0]);
+            return $this->normalizeImageUrl($images[0]);
         }
-        
+
         return asset('assets/images/no-image.jpg');
     }
 
@@ -110,12 +127,12 @@ class Product extends Model
         $allImages = [];
 
         if ($this->featured_image) {
-            $allImages[] = asset('uploads/products/' . $this->featured_image);
+            $allImages[] = $this->normalizeImageUrl($this->featured_image);
         }
 
         if (is_array($this->images)) {
             foreach ($this->images as $image) {
-                $allImages[] = asset('uploads/products/' . $image);
+                $allImages[] = $this->normalizeImageUrl($image);
             }
         }
 

@@ -37,7 +37,7 @@
                             <div class="product-left-box">
                                 <div class="row g-2">
                                     <div class="col-xxl-10 col-lg-12 col-md-10 order-xxl-2 order-lg-1 order-md-2">
-                                        <div class="product-main-2 no-arrow">
+                                        <div class="product-main no-arrow">
                                             @foreach($product->all_images as $index => $imageUrl)
                                                 <div>
                                                     <div class="slider-image">
@@ -53,7 +53,7 @@
                                     </div>
 
                                     <div class="col-xxl-2 col-lg-12 col-md-2 order-xxl-1 order-lg-2 order-md-1">
-                                        <div class="left-slider-image-2 left-slider no-arrow slick-top">
+                                        <div class="left-slider-image left-slider no-arrow slick-top">
                                             @foreach($product->all_images as $index => $imageUrl)
                                                 <div>
                                                     <div class="sidebar-image">

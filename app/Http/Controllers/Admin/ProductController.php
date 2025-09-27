@@ -75,6 +75,8 @@ class ProductController extends Controller
                     }
                 }
             }
+            // Normalize images array
+            $images = array_values(array_filter(array_unique($images)));
 
             // Map characteristics to specifications (key => value)
             $specifications = [];
@@ -197,6 +199,8 @@ class ProductController extends Controller
                     }
                 }
             }
+            // Normalize images array
+            $images = array_values(array_filter(array_unique($images)));
             $product->images = $images;
 
             // Update specifications from characteristics array

@@ -169,7 +169,8 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
     let images = <?php echo json_encode($product->images ?? []); ?>;
-    let characteristics = <?php echo json_encode($product->characteristics_translated ?? []); ?>;
+        let featuredImage = <?php echo json_encode($product->featured_image ?? null); ?>;
+        let characteristics = <?php echo json_encode($product->characteristics_translated ?? []); ?>;
         let indexCharacteristics = 0
         document.addEventListener('DOMContentLoaded', function() {
             quill('quill-editor-area', '#quill-editor')
@@ -297,12 +298,30 @@
 
         function showImage(images) {
             let listImages = '';
-            images.forEach((fileName) => {
-                const url = `${window.location.origin}/uploads/products/${fileName}`;
-                listImages += `<div style="width: 120px; position: relative" class="me-3 mb-3">
-                            <img src="${url}" width="100%" style="border: 1px solid rgb(0, 247, 255)" alt="image product">
-                        </div>`;
-            });
+            function normalizeImageUrl(value) {
+                if (!value) return `${window.location.origin}/assets/images/no-image.jpg`;
+                if (/^https?:\/\//i.test(value)) return value; // absolute URL
+                let v = String(value).replace(/^\/+/, '');
+                if (v.startsWith('uploads/')) {
+                    return `${window.location.origin}/${v}`;
+                }
+                return `${window.location.origin}/uploads/products/${v}`;
+            }
+
+            function showImage(imgs) {
+                let listImages = '';
+                const list = [];
+                if (featuredImage) list.push(featuredImage);
+                if (Array.isArray(imgs)) list.push(...imgs);
+                list.forEach((fileName) => {
+                    const url = normalizeImageUrl(fileName);
+                    listImages += `<div style="width: 120px; position: relative" class="me-3 mb-3">
+                                <img src="${url}" width="100%" style="border: 1px solid rgb(0, 247, 255)" alt="image product">
+                            </div>`;
+                });
+                const productImagesElement = document.getElementById('product-images');
+                productImagesElement.innerHTML = listImages;
+            }
 
             const productImagesElement = document.getElementById('product-images');
 

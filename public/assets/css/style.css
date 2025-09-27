@@ -34658,7 +34658,7 @@ body.rtl .menu-label {
     font-weight: 700
 }
 
->>.table:not(:last-child):last-child>* {
+.table:not(:last-child):last-child>* {
     border-bottom: none
 }
 
@@ -44319,15 +44319,19 @@ body.rtl .question-answer li .question-box .link-dislike-box {
 .product-section .left-slider-image .sidebar-image {
     border-radius: 8px;
     overflow: hidden;
-    background-color: #f8f8f8
+    background-color: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
 }
 
 .product-section .left-slider-image .sidebar-image img {
-    width: auto;
+    width: 100%;
     height: auto;
     cursor: pointer;
-    -o-object-fit: contain;
-    object-fit: contain
+    -o-object-fit: cover;
+    object-fit: cover
 }
 
 .product-section .right-box-contain {
@@ -45522,24 +45526,11 @@ body.rtl .question-answer li .question-box .link-dislike-box {
     bottom: -160px;
     width: 100%;
     z-index: 9;
-    background-color: #fff;
+    background-color: #f8f8f8;
     padding: calc(11px + -5*(100vw - 320px)/1600) 0;
     -webkit-box-shadow: 0 0 3px 1px rgba(34, 34, 34, .06);
     box-shadow: 0 0 3px 1px rgba(34, 34, 34, .06);
-    -webkit-transition: all .3s ease;
     transition: all .3s ease
-}
-
-.sticky-bottom-cart .cart-content {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-box-pack: justify;
-    -ms-flex-pack: justify;
-    justify-content: space-between
 }
 
 @media(max-width: 575px) {
