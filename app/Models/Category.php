@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 
 class Category extends Model
@@ -26,9 +25,7 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    public function translations(){
-        return $this->hasMany(CategoryTranslation::class);
-    }
+    // translations removed; single-table approach
 
     public function getNameTranslatedAttribute(){
         // Keep category name stable across locales; ignore translation to avoid logic conflicts

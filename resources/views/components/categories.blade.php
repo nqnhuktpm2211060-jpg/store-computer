@@ -1,7 +1,7 @@
 <ul class="category-list">
     @foreach ($categories as $category)
         <li class="onhover-category-list">
-            <a href="javascript:void(0)" class="category-name">
+            <a href="{{ route('product.index', ['category_l1_id' => $category->id]) }}" class="category-name">
                 <img src="{{ $category->icon_url }}" alt="">
                 <h6>{{ $category->name_translated }}</h6>
                 <i class="fa-solid fa-angle-right"></i>

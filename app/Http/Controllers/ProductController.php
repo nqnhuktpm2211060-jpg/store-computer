@@ -14,7 +14,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $productQuery = Product::with('reviews', 'category');
-        $categoryQuery = Category::with(['products', 'translations', 'categoryParent']);
+    $categoryQuery = Category::with(['products', 'categoryParent']);
 
         // Prefer ID-based filtering to avoid locale/translation mismatches; keep legacy name params as fallback
         $categoryL1Id = $request->get('category_l1_id');
@@ -100,7 +100,7 @@ class ProductController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->take(10)->get();
 
-            $categories = Category::with('translations')->where('id', '!=', $product->category_id)->get();
+            $categories = Category::query()->where('id', '!=', $product->category_id)->get();
             $suggestedProducts = collect();
 
             foreach ($categories as $category) {

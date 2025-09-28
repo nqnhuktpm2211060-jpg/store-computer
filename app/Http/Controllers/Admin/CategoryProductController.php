@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\CategoryTranslation;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -21,10 +20,7 @@ class CategoryProductController extends Controller
         $categoryQuery = Category::with([
             'products',
             'categoryParent',
-            'categoryChilden',
-            'translations' => function ($query) {
-                $query->where('language_code', App::getLocale());
-            }
+            'categoryChilden'
         ])->where('level', 1);
 
         if (request('name')) {
@@ -35,11 +31,11 @@ class CategoryProductController extends Controller
         }
         $categories = (clone $categoryQuery)->orderBy('created_at', 'DESC')->paginate(15);
 
-        $languages = Language::orderBy('name')->get();
+    $languages = Language::orderBy('name')->get();
 
-        $categoriesSelect = $categoryQuery->where('level', 1)->orderBy('name', 'ASC')->get();
+    $categoriesSelect = $categoryQuery->where('level', 1)->orderBy('name', 'ASC')->get();
 
-        return view('admin.category-product.index', compact('categories', 'categoriesSelect', 'languages'));
+    return view('admin.category-product.index', compact('categories', 'categoriesSelect', 'languages'));
     }
 
     /**
@@ -52,7 +48,7 @@ class CategoryProductController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required', 'level' => 'required', 'language' => 'required']);
+    $request->validate(['name' => 'required', 'level' => 'required']);
 
         if ($request->level == 2 && !$request->category_parent) {
             return redirect()->back()->with('error', 'Chưa chọn danh mục cha cho danh mục level 2');
@@ -63,11 +59,7 @@ class CategoryProductController extends Controller
             $category = Category::create([
                 'parent_id' => $request->category_parent ?? 0,
                 'level' => $request->level,
-                'icon' => $request->icon
-            ]);
-
-            $category->translations()->create([
-                'language_code' => $request->language,
+                'icon' => $request->icon,
                 'name' => $request->name
             ]);
 
@@ -84,11 +76,7 @@ class CategoryProductController extends Controller
      */
     public function show(Request $request, string $id)
     {
-        $language = $request->input('language', app()->getLocale());
-
-        $category = Category::with(['translations' => function ($query) use ($language) {
-            $query->where('language_code', $language);
-        }])->find($id);
+        $category = Category::find($id);
 
         if (!$category) {
             return response()->json([
@@ -113,7 +101,7 @@ class CategoryProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate(['name' => 'required', 'level' => 'required', 'language' => 'required']);
+    $request->validate(['name' => 'required', 'level' => 'required']);
 
         if ($request->level == 2 && !$request->category_parent) {
             return redirect()->back()->with('error', 'Chưa chọn danh mục cha cho danh mục level 2');
@@ -128,13 +116,7 @@ class CategoryProductController extends Controller
         $category->update([
             'parent_id' => $request->category_parent ?? 0,
             'level' => $request->level,
-            'icon' => $request->icon
-        ]);
-
-        CategoryTranslation::updateOrCreate([
-            'category_id' => $category->id,
-            'language_code' => $request->language
-        ], [
+            'icon' => $request->icon,
             'name' => $request->name
         ]);
 

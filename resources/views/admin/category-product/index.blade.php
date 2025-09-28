@@ -8,19 +8,7 @@
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a
                                 href="{{ route('admin.dashboard') }}">{{ __('admin.dashboard.statistics') }}</a>
-                        </li>
-                        <li class="breadcrumb-item" aria-current="page">{{ __('admin.category_management.category_list') }}
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-md-12">
-                    <div class="page-header-title">
-                        <h2 class="mb-2">{{ __('admin.category_management.category_list') }}</h2>
-                        <button data-bs-toggle="modal" data-bs-target="#add-category"
-                            class="btn btn-light-primary d-flex align-items-center gap-2"><i class="ti ti-plus"></i>
-                            {{ __('admin.category_management.add_category') }}</button>
-                    </div>
-                </div>
+                        
             </div>
         </div>
     </div>
@@ -134,19 +122,7 @@
                             <input type="text" class="form-control" name="name"
                                 placeholder="{{ __('admin.category_management.enter_category_name') }}" required>
                         </div>
-                        <div class="col-sm-12 col-xl-12">
-                            <div class="mb-3 mb-0">
-                                <label class="form-label">{{ __('admin.product_management.fields.language') }}</label>
-                                <select name="language" class="form-select" id="" required>
-                                    <option value="">{{ __('admin.product_management.placeholders.language') }}
-                                    </option>
-                                    @foreach ($languages as $lang)
-                                        <option value="{{ $lang->code }}">{{ $lang->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
+                        
                         <div class="mb-3">
                             <label for=""
                                 class="form-lable">{{ __('admin.category_management.select_level') }}</label>
@@ -230,19 +206,16 @@
                 const id = element.dataset.id;
 
                 if (id) {
-                    await getCategoryDetail(id, '{{ app()->getLocale() }}');
+                    await getCategoryDetail(id);
                     const modal = new bootstrap.Modal(document.getElementById('edit-category'));
                     modal.show();
                 }
             })
         });
 
-        async function getCategoryDetail(id, language_code) {
+        async function getCategoryDetail(id) {
             try {
                 let url = '{{ route('admin.category.product.show', ':id') }}'.replace(':id', id);
-                if (language_code) {
-                    url += `?language=${language_code}`;
-                }
 
                 const response = await fetch(url, {
                     method: "get",
@@ -261,23 +234,10 @@
 
                 const existingModal = document.getElementById('edit-category');
                 if (existingModal) {
-                    updateModalContent(category, id, language_code);
+                    updateModalContent(category, id);
                 } else {
-                    createModalContent(category, id, language_code);
+                    createModalContent(category, id);
                 }
-
-                const selectLanguage = document.getElementById('select-language');
-                const newSelectLanguage = selectLanguage.cloneNode(true);
-                selectLanguage.parentNode.replaceChild(newSelectLanguage, selectLanguage);
-
-                newSelectLanguage.value = language_code;
-                newSelectLanguage.addEventListener('change', function(event) {
-                    const language = event.target.value;
-                    event.preventDefault();
-                    if (language !== language_code) {
-                        getCategoryDetail(id, language);
-                    }
-                });
 
                 OnSelectCategoryParent();
             } catch (error) {
@@ -286,7 +246,7 @@
             }
         }
 
-        function createModalContent(category, id, language_code) {
+        function createModalContent(category, id) {
             document.getElementById('dialog-edit').innerHTML = `<div class="modal fade" id="edit-category" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -300,22 +260,7 @@
                         @method('put') 
                         <div class="mb-3">
                             <label for="" class="form-lable">{{ __('admin.category_management.category_name') }}</label>
-                            <input type="text" class="form-control" name="name" placeholder="{{ __('admin.category_management.enter_category_name') }}" value="${category.translations?.[0]?.name || ''}" required>
-                        </div>
-                        <div class="col-sm-12 col-xl-12">
-                            <div class="mb-3 mb-0">
-                                <label class="form-label">{{ __('admin.product_management.fields.language') }}</label>
-                                <select name="language" class="form-select" id="select-language" required>
-                                    <option value="">{{ __('admin.product_management.placeholders.language') }}
-                                    </option>
-                                    @foreach ($languages as $lang)
-                                        <option value="{{ $lang->code }}"
-                                            ${language_code == '{{ $lang->code }}' ? 'selected' : ''}>
-                                            {{ $lang->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <input type="text" class="form-control" name="name" placeholder="{{ __('admin.category_management.enter_category_name') }}" value="${category.name || ''}" required>
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-lable">{{ __('admin.category_management.select_level') }}</label>
@@ -348,10 +293,10 @@
     </div>`.replace(':id', id);
         }
 
-        function updateModalContent(category, id, language_code) {
+        function updateModalContent(category, id) {
             const form = document.querySelector('#edit-category-form');
 
-            form.querySelector('input[name="name"]').value = category.translations?.[0]?.name || '';
+            form.querySelector('input[name="name"]').value = category.name || '';
             form.querySelector('input[name="icon"]').value = category.icon || '';
 
             // Cập nhật select level

@@ -23,7 +23,7 @@ class Categories extends Component
      */
     public function render(): View|Closure|string
     {
-        $categories = Category::with('categoryChilden', 'translations')->where('level', 1)->OrderBy('name', 'asc')->get();
+    $categories = Category::with('categoryChilden')->where('level', 1)->OrderBy('name', 'asc')->get();
 
         return view('components.categories', compact('categories'));
     }

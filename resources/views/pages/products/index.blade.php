@@ -18,14 +18,33 @@
                                 @php
                                     $activeL1 = request('category_l1_id');
                                     $activeCat = request('category_id');
+                                    $activeL1Name = null;
+                                    $activeCatName = null;
+                                    if ($activeL1) {
+                                        $c = $categories->firstWhere('id', (int) $activeL1);
+                                        $activeL1Name = $c?->name_translated;
+                                    }
+                                    if ($activeCat) {
+                                        $c2 = $categories->firstWhere('id', (int) $activeCat);
+                                        $activeCatName = $c2?->name_translated;
+                                    }
                                 @endphp
-                                @if ($activeL1 || $activeCat || request('category_l1') || request('category'))
-                                    <li class="breadcrumb-item"> <a
-                                            href="{{ route('product.index') }}">{{ __('product.shop_at_home') }}</a>
+                                @if ($activeL1 || $activeCat)
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ route('product.index') }}">{{ __('product.shop_at_home') }}</a>
                                     </li>
-                                    <li class="breadcrumb-item active">
-                                        {{ request('category_l1') ?? request('category') }}
-                                    </li>
+                                    @if ($activeL1Name)
+                                        <li class="breadcrumb-item {{ $activeCatName ? '' : 'active' }}">
+                                            @if ($activeCatName)
+                                                <a href="{{ route('product.index', ['category_l1_id' => $activeL1]) }}">{{ $activeL1Name }}</a>
+                                            @else
+                                                {{ $activeL1Name }}
+                                            @endif
+                                        </li>
+                                    @endif
+                                    @if ($activeCatName)
+                                        <li class="breadcrumb-item active">{{ $activeCatName }}</li>
+                                    @endif
                                 @else
                                     <li class="breadcrumb-item active">{{ __('product.shop_at_home') }}</li>
                                 @endif

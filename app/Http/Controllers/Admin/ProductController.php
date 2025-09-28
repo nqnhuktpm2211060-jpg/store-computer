@@ -25,7 +25,7 @@ class ProductController extends Controller
         $languages = Language::orderBy('name')->get();
 
         $products = $productQuery->orderBy('created_at', 'DESC')->paginate(10);
-        $categories = Category::with('translations')->where('level', 2)->orderBy('name')->get();
+    $categories = Category::where('level', 2)->orderBy('name')->get();
 
         return view('admin.product.index', compact('products', 'languages', 'categories'));
     }
@@ -143,7 +143,7 @@ class ProductController extends Controller
         
         $languages = Language::orderBy('name')->get();
 
-        $categories = Category::with('translations')->where('level', 2)->orderBy('name')->get();
+    $categories = Category::where('level', 2)->orderBy('name')->get();
 
         return view('admin.product.edit', compact('product', 'categories', 'languages'));
     }
