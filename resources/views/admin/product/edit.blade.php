@@ -108,10 +108,9 @@
                                     <select name="category_id" class="form-select" id="" required>
                                         @foreach ($categories as $it)
                                             @if ($product->category_id == $it->id)
-                                                <option value="{{ $it->id }}" selected>{{ $it->name }}
-                                                </option>
+                                                <option value="{{ $it->id }}" selected>{{ $it->name_translated }}</option>
                                             @else
-                                                <option value="{{ $it->id }}">{{ $it->name }}</option>
+                                                <option value="{{ $it->id }}">{{ $it->name_translated }}</option>
                                             @endif
                                         @endforeach
                                     </select>

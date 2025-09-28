@@ -82,6 +82,7 @@ return [
         'product' => 'Sản phẩm',
     ],
     'category_management' => [
+        'title' => 'Danh mục sản phẩm',
         'category_list' => 'Danh sách danh mục',
         'add_category' => 'Thêm danh mục',
         'category_name' => 'Tên danh mục',
@@ -258,6 +259,7 @@ return [
             'submit_add' => 'Thêm Mới',
             'submit_update' => 'Cập nhật'
         ],
+        'no_level2_categories' => 'Chưa có danh mục cấp 2',
     ],
     'review_management' => [
         'title' => 'Quản lý đánh giá',

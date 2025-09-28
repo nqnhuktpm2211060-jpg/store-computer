@@ -6,9 +6,20 @@
             <div class="row align-items-center">
                 <div class="col-md-12">
                     <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a
-                                href="{{ route('admin.dashboard') }}">{{ __('admin.dashboard.statistics') }}</a>
-                        
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('admin.dashboard') }}">{{ __('admin.dashboard.statistics') }}</a>
+                        </li>
+                        <li class="breadcrumb-item" aria-current="page">{{ __('admin.category_management.title') }}</li>
+                    </ul>
+                </div>
+                <div class="col-md-12">
+                    <div class="page-header-title d-flex justify-content-between align-items-center">
+                        <h2 class="mb-2">{{ __('admin.category_management.title') }}</h2>
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#add-category" class="btn btn-light-primary d-flex align-items-center gap-2">
+                            <i class="ti ti-plus"></i> {{ __('admin.category_management.add_category') }}
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -45,9 +56,11 @@
                                         <td>{{ $it->id }}</td>
                                         <td>{{ $it->name_translated }}</td>
                                         <td>
-                                            {!! $it->icon
-                                                ? '<img src="' . $it->icon . '" style="width: 25px; height: 25px" class="blur-up lazyload" alt="">'
-                                                : __('admin.category_management.no_icon') !!}
+                                            @if($it->icon_url)
+                                                <img src="{{ $it->icon_url }}" style="width: 25px; height: 25px" class="blur-up lazyload" alt="">
+                                            @else
+                                                {{ __('admin.category_management.no_icon') }}
+                                            @endif
                                         </td>
                                         <td>{{ $it->categoryChilden ? $it->categoryChilden->count() : __('admin.category_management.no_subcategory') }}
                                         </td>
@@ -66,7 +79,7 @@
                                         </td>
                                     </tr>
                                     @foreach ($it->categoryChilden as $sub_category)
-                                        <tr class="sub-row">
+                                        <tr class="sub-row" style="display:none;">
                                             <td>{{ $sub_category->id }}</td>
                                             <td>{{ $sub_category->name_translated }}</td>
                                             <td></td>
@@ -166,9 +179,8 @@
         document.querySelectorAll('.parent-row').forEach(row => {
             row.addEventListener('dblclick', () => {
                 let subRows = row.nextElementSibling;
-
                 while (subRows && subRows.classList.contains('sub-row')) {
-                    subRows.classList.toggle('show');
+                    subRows.style.display = (subRows.style.display === 'none' || subRows.style.display === '') ? 'table-row' : 'none';
                     subRows = subRows.nextElementSibling;
                 }
             });

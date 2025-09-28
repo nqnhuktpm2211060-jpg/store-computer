@@ -82,6 +82,7 @@ return [
         'product' => 'Product',
     ],
     'category_management' => [
+        'title' => 'Product Categories',
         'category_list' => 'Category List',
         'add_category' => 'Add Category',
         'category_icon' => 'Category Icon',
@@ -264,6 +265,7 @@ return [
             'submit_delete' => 'Delete',
             'submit_update' => 'Update'
         ],
+        'no_level2_categories' => 'No level-2 categories yet',
         'messages' => [
             'delete_image_error' => 'An error occurred while deleting the image.',
             'delete_characteristic_error' => 'An error occurred while deleting the characteristic.',

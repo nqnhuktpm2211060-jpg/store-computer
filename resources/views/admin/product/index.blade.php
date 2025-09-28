@@ -180,10 +180,11 @@
                                                     <select name="category_id" class="form-select" id=""
                                                         required>
                                                         <option value="">{{__('admin.product_management.placeholders.category')}}</option>
-                                                        @foreach ($categories as $it)
-                                                            <option value="{{ $it->id }}">{{ $it->name }}
-                                                            </option>
-                                                        @endforeach
+                                                        @forelse ($categories as $it)
+                                                            <option value="{{ $it->id }}">{{ $it->name_translated }}</option>
+                                                        @empty
+                                                            <option value="" disabled>{{ __('admin.product_management.no_level2_categories') }}</option>
+                                                        @endforelse
                                                     </select>
                                                 </div>
                                             </div>

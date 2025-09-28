@@ -29,7 +29,12 @@ class Category extends Model
 
     public function getNameTranslatedAttribute(){
         // Keep category name stable across locales; ignore translation to avoid logic conflicts
-        return $this->name;
+        $name = trim((string)($this->attributes['name'] ?? ''));
+        if ($name !== '') {
+            return $name;
+        }
+        // Fallback to a readable placeholder if name is missing
+        return 'Danh mục #' . (string) $this->attributes['id'];
     }
 
     // Helpers for icon normalization
