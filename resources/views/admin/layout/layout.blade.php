@@ -260,24 +260,6 @@
             @yield('content')
         </div>
     </div>
-    <footer class="pc-footer">
-        <div class="footer-wrapper container-fluid">
-            <div class="row">
-                <div class="col my-1">
-                    <p class="m-0"><a href="https://idai.vn/" target="_blank">Idai &#9829;</a></p>
-                </div>
-                {{-- <div class="col-auto my-1">
-                    <ul class="list-inline footer-link mb-0">
-                        <li class="list-inline-item"><a href="https://idai.vn/">Home</a></li>
-                        <li class="list-inline-item"><a href="https://phoenixcoded.gitbook.io/able-pro/"
-                                target="_blank">Documentation</a></li>
-                        <li class="list-inline-item"><a href="https://phoenixcoded.authordesk.app/"
-                                target="_blank">Support</a></li>
-                    </ul>
-                </div> --}}
-            </div>
-        </div>
-    </footer>
     <div class="pct-c-btn"><a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_pc_layout"><i
                 class="ph-duotone ph-gear-six"></i></a></div>
     <div class="offcanvas border-0 pct-offcanvas offcanvas-end" tabindex="-1" id="offcanvas_pc_layout">
