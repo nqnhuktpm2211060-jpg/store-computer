@@ -16,32 +16,17 @@
                                     </a>
                                 </li>
                                 @php
-                                    $activeL1 = request('category_l1_id');
                                     $activeCat = request('category_id');
-                                    $activeL1Name = null;
                                     $activeCatName = null;
-                                    if ($activeL1) {
-                                        $c = $categories->firstWhere('id', (int) $activeL1);
-                                        $activeL1Name = $c?->name_translated;
-                                    }
                                     if ($activeCat) {
                                         $c2 = $categories->firstWhere('id', (int) $activeCat);
                                         $activeCatName = $c2?->name_translated;
                                     }
                                 @endphp
-                                @if ($activeL1 || $activeCat)
+                                @if ($activeCat)
                                     <li class="breadcrumb-item">
                                         <a href="{{ route('product.index') }}">{{ __('product.shop_at_home') }}</a>
                                     </li>
-                                    @if ($activeL1Name)
-                                        <li class="breadcrumb-item {{ $activeCatName ? '' : 'active' }}">
-                                            @if ($activeCatName)
-                                                <a href="{{ route('product.index', ['category_l1_id' => $activeL1]) }}">{{ $activeL1Name }}</a>
-                                            @else
-                                                {{ $activeL1Name }}
-                                            @endif
-                                        </li>
-                                    @endif
                                     @if ($activeCatName)
                                         <li class="breadcrumb-item active">{{ $activeCatName }}</li>
                                     @endif
@@ -61,13 +46,12 @@
                 <div class="col-12">
                     <div class="slider-7_1 no-space shop-box no-arrow">
 
-                        @foreach ($categories->where('level', 1) as $category)
+                        @foreach ($categories as $category)
                             <div>
                                 <div class="shop-category-box">
                                     @php
-                                        // Build link using ID param and removing lower-level filter
-                                        $query = collect(request()->query())->except(['category','category_id'])->toArray();
-                                        $url = route('product.index', $query + ['category_l1_id' => $category->id]);
+                                        $query = collect(request()->query())->except(['category_id'])->toArray();
+                                        $url = route('product.index', $query + ['category_id' => $category->id]);
                                     @endphp
                                     <a href="{{ $url }}">
                                         <div class="shop-category-image">
@@ -120,18 +104,13 @@
 
 
                                             @php
-                                                $level2 = $categories->where('level', 2);
-                                                if ($activeL1) {
-                                                    $level2 = $level2->filter(function($c) use ($activeL1){
-                                                        return optional($c->categoryParent)->id == $activeL1;
-                                                    });
-                                                }
+                                                $level2 = $categories;
                                             @endphp
                                             <ul class="category-list custom-padding custom-height">
                                                 @foreach ($level2 as $category)
                                                     @php
                                                         $isActive = (string)request('category_id') === (string)$category->id;
-                                                        $url = route('product.index', collect(request()->query())->toArray() + ['category_id' => $category->id]);
+                                                        $url = route('product.index', ['category_id' => $category->id]);
                                                     @endphp
                                                     <li>
                                                         <a href="{{ $url }}" class="d-flex justify-content-between align-items-center {{ $isActive ? 'fw-bold' : '' }}">

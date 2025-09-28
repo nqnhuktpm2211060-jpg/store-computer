@@ -16,26 +16,10 @@ class ProductController extends Controller
         $productQuery = Product::with('reviews', 'category');
     $categoryQuery = Category::with(['products', 'categoryParent']);
 
-        // Prefer ID-based filtering to avoid locale/translation mismatches; keep legacy name params as fallback
-        $categoryL1Id = $request->get('category_l1_id');
+        // Single-parameter filtering: category_id only
         $categoryId = $request->get('category_id');
-
-        if ($categoryL1Id) {
-            $productQuery->whereHas('category', function ($q) use ($categoryL1Id) {
-                $q->where('parent_id', (int) $categoryL1Id);
-            });
-        } elseif ($request->category_l1) {
-            $productQuery->whereHas('category.categoryParent', function ($query) use ($request) {
-                $query->where('name', $request->category_l1);
-            });
-        }
-
         if ($categoryId) {
             $productQuery->where('category_id', (int) $categoryId);
-        } elseif ($request->category) {
-            $productQuery->whereHas('category', function ($query) use ($request) {
-                $query->where('name', $request->category);
-            });
         }
         if ($request->search) {
             $productQuery->where('name', 'like', '%' . $request->search . '%');

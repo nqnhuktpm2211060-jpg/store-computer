@@ -1,7 +1,7 @@
 <ul class="category-list">
     @foreach ($categories as $category)
         <li class="onhover-category-list">
-            <a href="{{ route('product.index', ['category_l1_id' => $category->id]) }}" class="category-name">
+            <a href="{{ route('product.index', ['category_id' => $category->id]) }}" class="category-name">
                 <img src="{{ $category->icon_url }}" alt="">
                 <h6>{{ $category->name_translated }}</h6>
                 <i class="fa-solid fa-angle-right"></i>
@@ -15,7 +15,7 @@
                     <ul>
                         @foreach ($category->categoryChilden as $cate)
                             <li>
-                                <a href="{{ route('product.index', ['category_l1_id' => $category->id, 'category_id' => $cate->id]) }}">{{ $cate->name_translated }}</a>
+                                <a href="{{ route('product.index', ['category_id' => $cate->id]) }}">{{ $cate->name_translated }}</a>
                             </li>
                         @endforeach
                     </ul>
