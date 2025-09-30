@@ -1,9 +1,9 @@
 <?php
 return [
-    'fresh_products' => 'Fresh Products',
-    'free_delivery' => 'Free Delivery on order above $50',
-    'daily_mega_discount' => 'Daily Mega Discount',
-    'best_price' => 'Best price on the market',
+    'fresh_products' => 'Genuine Laptops & PCs',
+    'free_delivery' => 'Fast free delivery in-city*',
+    'daily_mega_discount' => 'Daily tech deals',
+    'best_price' => 'Best value – Trusted warranty',
     'company_name' => 'TECHBYTE Technology Investment Company Limited',
     'address' => '256, Nguyen Van Cu, An Khanh, Ninh Kieu, Can Tho',
     'email' => 'ai@idai.vn',

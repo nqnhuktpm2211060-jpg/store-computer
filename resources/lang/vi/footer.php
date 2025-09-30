@@ -1,9 +1,9 @@
 <?php
 return [
-    'fresh_products' => 'Sản phẩm tươi',
-    'free_delivery' => 'Giao hàng miễn phí cho đơn hàng trên $50',
-    'daily_mega_discount' => 'Giảm giá Mega hàng ngày',
-    'best_price' => 'Giá tốt nhất trên thị trường',
+    'fresh_products' => 'Laptop & PC chính hãng',
+    'free_delivery' => 'Giao nhanh miễn phí nội thành*',
+    'daily_mega_discount' => 'Deal công nghệ mỗi ngày',
+    'best_price' => 'Giá tốt – Bảo hành uy tín',
     'company_name' => 'Công Ty TNHH Đầu Tư Công Nghệ TECHBYTE',
     'address' => 'Số 256, Đường Nguyễn Văn Cừ, Phường An Khánh, Ninh Kiều, Cần Thơ',
     'email' => 'ai@idai.vn',
