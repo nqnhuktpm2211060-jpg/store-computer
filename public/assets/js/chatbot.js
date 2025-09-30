@@ -105,14 +105,19 @@ class SimpleChatBot {
             // Get CSRF token
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
+            // Client-side timeout using AbortController (15s)
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 15000);
             const response = await fetch('/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': token
                 },
-                body: JSON.stringify({ message: message, history: this.history })
+                body: JSON.stringify({ message: message, history: this.history }),
+                signal: controller.signal
             });
+            clearTimeout(timer);
 
             const data = await response.json();
             
@@ -127,7 +132,8 @@ class SimpleChatBot {
             }
         } catch (error) {
             console.error('Error:', error);
-            this.addMessage('Không thể kết nối. Vui lòng kiểm tra internet và thử lại.', 'bot');
+            const isAbort = (error && (error.name === 'AbortError' || error.message?.includes('aborted')));
+            this.addMessage(isAbort ? 'Kết nối chậm, mình tạm dừng yêu cầu. Bạn thử lại giúp mình nhé.' : 'Không thể kết nối. Vui lòng kiểm tra internet và thử lại.', 'bot');
         } finally {
             this.setTyping(false);
             send.disabled = false;

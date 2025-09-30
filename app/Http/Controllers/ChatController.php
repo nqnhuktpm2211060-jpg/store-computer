@@ -57,8 +57,30 @@ class ChatController extends Controller
         $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
         $apiKey = env('GEMINI_API_KEY');
         if (empty($apiKey)) {
+            // Graceful local fallback: suggest from our catalog instead of failing
             Log::warning('GEMINI_API_KEY missing for chatbot');
-            return response()->json(['reply' => 'Chatbot chưa được cấu hình khóa API. Vui lòng liên hệ quản trị viên.'], 200);
+            try {
+                $suggest = $specificProducts;
+                if (!$suggest || $suggest->count() === 0) {
+                    $suggest = $this->productService->getFeaturedProducts(3);
+                }
+                if ($suggest && $suggest->count() > 0) {
+                    $lines = [
+                        "Mình chưa kết nối được AI đám mây, nhưng có vài gợi ý cho bạn:" 
+                    ];
+                    foreach ($suggest as $p) {
+                        $price = $p->sale_price > 0 ? $p->sale_price : $p->price;
+                        $cat = $p->category_name ?? ($p->category?->name ?? '');
+                        $brand = $p->brand ? (" | ".$p->brand) : '';
+                        $lines[] = "• {$p->name}{$brand}" . ($cat ? " | {$cat}" : '') . " | Giá: " . number_format($price) . "đ";
+                    }
+                    $lines[] = "Bạn có thể mô tả rõ hơn nhu cầu (gaming, văn phòng, đồ họa) để mình lọc chính xác hơn nhé.";
+                    return response()->json(['reply' => implode("\n", $lines)], 200);
+                }
+            } catch (\Throwable $e) {
+                // ignore and fall through
+            }
+            return response()->json(['reply' => 'Chatbot tạm thời không kết nối được AI. Bạn cho mình biết nhu cầu (gaming/văn phòng/đồ họa) và tầm giá để mình gợi ý nhanh nhé.'], 200);
         }
 
         // Tạo prompt với context từ database và lịch sử hội thoại ngắn
@@ -88,7 +110,16 @@ class ChatController extends Controller
                 $prompt = mb_substr($prompt, 0, 3500) . "\n…";
             }
 
-            $response = Http::timeout(12)->post("{$apiUrl}?key={$apiKey}", [
+            $httpClient = Http::timeout(12);
+            $verify = env('GEMINI_SSL_VERIFY', true);
+            $caBundle = env('GEMINI_CA_BUNDLE');
+            if (!empty($caBundle)) {
+                $httpClient = $httpClient->withOptions(['verify' => $caBundle]);
+            } elseif (is_string($verify) ? filter_var($verify, FILTER_VALIDATE_BOOLEAN) === false : $verify === false) {
+                $httpClient = $httpClient->withoutVerifying();
+            }
+
+            $response = $httpClient->post("{$apiUrl}?key={$apiKey}", [
                 'contents' => [
                     [
                         'parts' => [['text' => $prompt]]
@@ -113,12 +144,17 @@ class ChatController extends Controller
                 $status = $response->status();
                 $body = $response->body();
                 Log::warning('ChatBot API non-2xx response', ['status' => $status, 'body' => $body]);
-                if ($status === 429 || stripos($body, 'quota') !== false) {
+                if (stripos($body, 'SSL certificate problem') !== false || stripos($body, 'curl error 60') !== false) {
+                    $reply = "Máy chủ không thể xác thực chứng chỉ SSL khi gọi Gemini. Vui lòng cập nhật bộ chứng chỉ CA hoặc tạm thời đặt GEMINI_SSL_VERIFY=false cho môi trường nội bộ.";
+                } else if ($status === 401 || $status === 403 || stripos($body, 'unauthorized') !== false || stripos($body, 'forbidden') !== false) {
+                    $reply = "Khóa API Gemini không hợp lệ hoặc bị hạn chế quyền. Vui lòng kiểm tra lại cấu hình GEMINI_API_KEY.";
+                } else if ($status === 429 || stripos($body, 'quota') !== false) {
                     $reply = "Chatbot hiện tại đã vượt quá giới hạn sử dụng. Vui lòng thử lại sau 24h.";
                 } else if ($status >= 500 && $status < 600) {
                     // Thử lại 1 lần nhanh cho lỗi tạm thời
                     try {
-                        $retry = Http::timeout(10)->post("{$apiUrl}?key={$apiKey}", [
+                        $retryClient = $httpClient->timeout(10);
+                        $retry = $retryClient->post("{$apiUrl}?key={$apiKey}", [
                             'contents' => [[ 'parts' => [['text' => $prompt]] ]]
                         ]);
                         if ($retry->successful()) {
@@ -144,9 +180,12 @@ class ChatController extends Controller
             ]);
             
             // Xử lý lỗi quota exceeded
-            if (strpos($e->getMessage(), 'quota') !== false || strpos($e->getMessage(), '429') !== false) {
+            $message = $e->getMessage();
+            if (stripos($message, 'SSL certificate problem') !== false || stripos($message, 'cURL error 60') !== false) {
+                $reply = "Không thể xác thực chứng chỉ SSL khi kết nối Gemini. Bạn hãy tải/cập nhật file CA (cacert.pem) và đặt đường dẫn vào GEMINI_CA_BUNDLE, hoặc tạm đặt GEMINI_SSL_VERIFY=false trên môi trường local.";
+            } else if (strpos($message, 'quota') !== false || strpos($message, '429') !== false) {
                 $reply = "Chatbot hiện tại đã vượt quá giới hạn sử dụng. Vui lòng thử lại sau 24h.";
-            } else if (strpos($e->getMessage(), 'timed out') !== false) {
+            } else if (strpos($message, 'timed out') !== false) {
                 $reply = "Hệ thống đang chậm. Bạn vui lòng thử lại sau ít phút nhé.";
             } else {
                 $reply = "Xin lỗi, có lỗi xảy ra khi giao tiếp với dịch vụ AI.";

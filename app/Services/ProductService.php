@@ -111,7 +111,8 @@ class ProductService
         try {
             foreach ($categories as $category) {
                 $productCount = Product::active()->byCategory($category->id)->count();
-                $context .= "• {$category->name} ({$productCount} sản phẩm)\n";
+                $catName = $category->name ?? ("Danh mục #" . $category->id);
+                $context .= "• {$catName} ({$productCount} sản phẩm)\n";
             }
         } catch (\Throwable $e) {
             Log::warning('Chat context category count failed', ['error' => $e->getMessage()]);
@@ -134,7 +135,8 @@ class ProductService
 
                 $context .= "• {$product->name}\n";
                 $context .= "  └ Thương hiệu: " . ($product->brand ?? 'Không rõ') . "\n";
-                $context .= "  └ Danh mục: " . ($product->category_name ?? ($product->category->name ?? '')) . "\n";
+                // Use nullsafe operator in case relation is missing
+                $context .= "  └ Danh mục: " . ($product->category_name ?? ($product->category?->name ?? '')) . "\n";
                 $context .= "  └ Giá: " . number_format($price) . "đ{$originalPrice}\n";
                 $context .= "  └ Còn hàng: {$product->stock_quantity} máy{$rating}\n";
 
