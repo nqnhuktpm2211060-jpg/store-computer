@@ -411,10 +411,7 @@
                                         <a href="javascript:void(0)">{{ __('footer.address') }}
                                         </a>
                                     </li>
-                                    <li>
-                                        <i data-feather="mail"></i>
-                                        <a href="javascript:void(0)">{{ __('footer.email') }}</a>
-                                    </li>
+                                    
                                 </ul>
                             </div>
                         </div>
@@ -474,7 +471,7 @@
                                         <i data-feather="mail"></i>
                                         <div class="contact-number">
                                             <h6 class="text-content">{{ __('footer.email_address') }}:</h6>
-                                            <h5>{{__('footer.email')}}</h5>
+                                            <h5>nqnhu@gmail.com</h5>
                                         </div>
                                     </div>
                                 </li>
@@ -504,7 +501,7 @@
 
             <div class="sub-footer section-small-space">
                 <div class="reserve">
-                    <h6 class="text-content">©2024 <a href="http://idai.vn">Idai.vn</a>
+                    <h6 class="text-content">©2025 <a href="#">NQNhu</a>
                         {{ __('footer.all_rights_reserved') }}</h6>
                 </div>
 
