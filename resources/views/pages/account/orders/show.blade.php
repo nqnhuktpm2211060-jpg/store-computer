@@ -32,6 +32,16 @@
                     <div class="d-flex justify-content-between mb-2"><span>Trạng thái:</span><span>{!! $order->status_label !!}</span></div>
                     <div class="d-flex justify-content-between mb-2"><span>Thanh toán:</span><span>{{ strtoupper($order->payment_method ?? 'cash') }}</span></div>
                     <div class="d-flex justify-content-between mb-2"><span>Tổng tiền:</span><span class="fw-bold">{{ $order->formatted_total }}</span></div>
+                    @php
+                        $status = (int)($order->status ?? 0);
+                        if ($status === 0) { $status = 1; }
+                    @endphp
+                    @if(in_array($status, [1,2]))
+                        <form action="{{ route('orders.cancel', $order->id) }}" method="post" onsubmit="return confirm('Bạn chắc muốn hủy đơn này?');">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger w-100 mt-2">Hủy đơn hàng</button>
+                        </form>
+                    @endif
                 </div>
             </div>
             <div class="col-12 col-lg-8">

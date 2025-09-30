@@ -51,25 +51,31 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Order not found');
         }
 
-        if (request('status') === 2 && $order->status !== 1){
-            return redirect()->back()->with('error', 'Không thể cập nhật trạng thái "Đang chuẩn bị" khi đơn hàng không phải ở trạng thái "Mới đặt hàng"!');
+        // Normalize current status: DB default 0 => treat as 1 (new)
+        $current = (int)($order->status ?? 0);
+        if ($current === 0) { $current = 1; }
+
+        $newStatus = (int) request('status');
+        if (!$newStatus) {
+            return redirect()->back()->with('error', 'Trạng thái không hợp lệ');
         }
 
-        if (request('status') === 3 && $order->status !== 2){
-            return redirect()->back()->with('error', 'Không thể cập nhật trạng thái "Hoàn Tất" khi đơn hàng không phải ở trạng thái "Đang chuẩn bị"!');
+        // Disallow updates once completed or cancelled
+        if (in_array($current, [3,4], true)) {
+            return redirect()->back()->with('error', 'Đơn hàng đã ở trạng thái cuối, không thể cập nhật');
         }
 
-        if ($order->status === 3){
-            return redirect()->back()->with('error', 'Đơn hàng đã Hoàn thành không thể tiếp tục cập nhật trạng thái');
+        // Allowed transitions: 1->2 (đang giao), 1->4 (hủy), 2->3 (hoàn tất), 2->4 (hủy)
+        $allowed = [
+            1 => [2,4],
+            2 => [3,4],
+        ];
+
+        if (!isset($allowed[$current]) || !in_array($newStatus, $allowed[$current], true)) {
+            return redirect()->back()->with('error', 'Chuyển trạng thái không hợp lệ');
         }
 
-        if ($order->status === 3){
-            return redirect()->back()->with('error', 'Đơn hàng đã bị Hủy đơn hàng');
-        }
-
-        $order->update([
-            'status' => request('status')
-        ]);
+        $order->update(['status' => $newStatus]);
 
         return redirect()->back()->with('success', 'Cập nhật trạng thái thành công');
     }

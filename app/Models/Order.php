@@ -31,6 +31,12 @@ class Order extends Model
 
     public function getStatusLabelAttribute()
     {
+        // Normalize 0 (DB default) to 1 (New)
+        $status = (int)($this->status ?? 0);
+        if ($status === 0) {
+            $status = 1;
+        }
+
         $statuses = [
             1 => '<span class="text-info">'.__('admin.order.new') .'</span>',
             2 => '<span class="text-warning">'.__('admin.order.delivering') .'</span>',
@@ -38,7 +44,7 @@ class Order extends Model
             4 => '<span class="text-danger">'.__('admin.order.cancelled') .'</span>'
         ];
 
-        return $statuses[$this->status] ?? 'Unknown';
+        return $statuses[$status] ?? 'Unknown';
     }
     public function getFormattedTotalAttribute()
     {

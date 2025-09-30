@@ -80,9 +80,10 @@ Route::middleware('set_locale')->group(function () {
         Route::get('payment-vnpay-return', [PaymentByVnpay::class, 'handlePaymentReturn'])->name('payment.vnpay.return');
         Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
-        // User orders
+    // User orders
         Route::get('don-hang-cua-toi', [UserOrderController::class, 'index'])->name('orders.index');
         Route::get('don-hang/{id}', [UserOrderController::class, 'show'])->name('orders.show');
+    Route::post('don-hang/{id}/huy', [UserOrderController::class, 'cancel'])->name('orders.cancel');
     });
 
     Route::get('/lang/{locale}', [LanguageController::class, 'switchLang'])->name('lang.switch');
