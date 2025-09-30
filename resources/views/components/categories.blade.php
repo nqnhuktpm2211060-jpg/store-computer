@@ -19,18 +19,25 @@
                             </li>
                         @endforeach
                     </ul>
-
                 </div>
-                {{-- <div class="list-2">
-                    <div class="category-title-box">
-                        <h5>Organic Vegetables</h5>
+                @if(($category->previewProducts ?? collect())->isNotEmpty())
+                    <div class="list-2">
+                        <div class="category-title-box">
+                            <h5>{{ __('product.featured') }}</h5>
+                        </div>
+                        <ul>
+                            @foreach (($category->previewProducts ?? []) as $p)
+                                <li>
+                                    <a href="{{ route('product.detail', ['id' => $p->id]) }}" style="display:flex;align-items:center;gap:8px;">
+                                        <img src="{{ $p->main_image }}" alt="{{ $p->name }}" width="40" height="40" style="object-fit:cover;border-radius:4px;">
+                                        <span class="name" style="flex:1;">{{ $p->name }}</span>
+                                        <span class="price" style="white-space:nowrap;">{{ number_format($p->current_price, 0, '.', ',') }}đ</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
-                    <ul>
-                        <li>
-                            <a href="javascript:void(0)">Potato & Tomato</a>
-                        </li>
-                    </ul>
-                </div> --}}
+                @endif
             </div>
         </li>
     @endforeach
